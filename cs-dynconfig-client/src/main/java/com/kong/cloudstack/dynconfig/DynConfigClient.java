@@ -23,6 +23,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 /**
  * 动态配置中心客户端
+ * 获取动态配置信息主动从zk获取，但考虑到zk server故障时的处理 需要本地存储容灾（zk client是否已经实现了该功能）
  * Created by kong on 2016/1/24.
  */
 public class DynConfigClient {
@@ -33,6 +34,7 @@ public class DynConfigClient {
     private List<IChangeListener> listeners;
     private ConcurrentMap<String, PathChildrenCache> pathChildrenCacheMap = Maps.newConcurrentMap();
     private ConcurrentMap<String, Object> recoverDataCache = Maps.newConcurrentMap();
+    //指定的zk ip
     private String zkIp = null;
 
     public DynConfigClient() {
@@ -42,13 +44,16 @@ public class DynConfigClient {
         this.zkIp = zkIp;
     }
 
+    //初始化zookeeper客户端
     public void init() {
         if(!this.isStart) {
+            //注册监听器
             this.innerRegisterListeners(ZKClient.getClient());
         }
 
     }
 
+    //对 指定ip的zk进行相关初始化
     public void init(boolean isMulti) {
         if(!this.isStart && isMulti) {
             this.innerRegisterListeners(ZKClientManager.getClient(this.zkIp));
@@ -56,27 +61,57 @@ public class DynConfigClient {
 
     }
 
+    /**
+     * 从zk server获取配置信息 （主动调用）
+     * @param group
+     * @param dataId
+     * @return
+     * @throws Exception   抛出异常，由上层业务处理(一般退出应用，启动失败)
+     */
     public String getConfig(String group, String dataId) throws Exception {
         return this.getConfig(CloudContextFactory.getCloudContext().getProductCode(), CloudContextFactory.getCloudContext().getApplicationName(), group, dataId);
     }
 
+    /**
+     * 获取特定appName的配置项值
+     * @param appName
+     * @param group
+     * @param dataId
+     * @return
+     * @throws Exception
+     */
     public String getConfig(String appName, String group, String dataId) throws Exception {
-        String path = String.format("/configs/%s/%s/%s", new Object[]{appName, group, dataId});
+        String path = String.format(PATH_FORMAT, new Object[]{appName, group, dataId});
         return this.getConfig(path);
     }
 
+    /**
+     *
+     * @param productCode 产品线code
+     * @param appName
+     * @param group
+     * @param dataId
+     * @return
+     * @throws Exception
+     */
     public String getConfig(String productCode, String appName, String group, String dataId) throws Exception {
         String path = null;
         if(productCode == null) {
-            path = String.format("/configs/%s/%s/%s", new Object[]{appName, group, dataId});
+            path = String.format(PATH_FORMAT, new Object[]{appName, group, dataId});
         } else {
-            path = String.format("/configs/%s/%s/%s/%s", new Object[]{productCode, appName, group, dataId});
+            path = String.format(CLOUD_PATH_FORMAT, new Object[]{productCode, appName, group, dataId});
         }
 
         return this.getConfig(path);
     }
 
-    public final String getConfig(String path) throws Exception {
+    /**
+     * 获取特定路径的配置项值
+     * @param path
+     * @return
+     * @throws Exception
+     */
+    public final String getConfig(final String path) throws Exception {
         String recoverPath = null;
         if(this.zkIp != null && this.zkIp.trim().length() > 0) {
             recoverPath = "/" + this.zkIp + path;
@@ -93,6 +128,7 @@ public class DynConfigClient {
             bytes1 = (byte[])e.getData().forPath(path);
             isSucc = true;
         } catch (Exception var6) {
+            //从本地获取配置数据
             bytes1 = ZKRecoverUtil.loadRecoverData(recoverPath);
         }
 
@@ -100,39 +136,63 @@ public class DynConfigClient {
         return bytes1 == null?"":new String(bytes1);
     }
 
+    /**
+     * 获取特定路径的子节点
+     * @param path
+     * @return
+     * @throws Exception
+     */
     public List<String> getNodes(String path) throws Exception {
         CuratorFramework client = this.zkIp == null?ZKClient.getClient():ZKClientManager.getClient(this.zkIp);
         List nodes = (List)client.getChildren().forPath(path);
         return nodes;
     }
 
-    public void registerListeners(String group, String dataId, IChangeListener listener) {
+    /**
+     * 为特定组下特定的配置项注册监听器
+     * @param group
+     * @param dataId
+     * @param listener
+     */
+    public void registerListeners(final String group,final String dataId,final IChangeListener listener) {
         this.registerListeners(CloudContextFactory.getCloudContext().getApplicationName(), group, dataId, listener);
     }
 
     /** @deprecated */
     public void registerListeners(String appName, String group, String dataId, IChangeListener listener) {
-        String path = String.format("/configs/%s/%s/%s", new Object[]{appName, group, dataId});
+        String path = String.format(PATH_FORMAT, new Object[]{appName, group, dataId});
         this.doRegisterListeners((String)null, appName, path, group, dataId, listener);
     }
+
 
     public void registerListeners(String productCode, String appName, String group, String dataId, IChangeListener listener) {
         String path = null;
         if(productCode == null) {
-            path = String.format("/configs/%s/%s/%s", new Object[]{appName, group, dataId});
+            path = String.format(PATH_FORMAT, new Object[]{appName, group, dataId});
         } else {
-            path = String.format("/configs/%s/%s/%s/%s", new Object[]{productCode, appName, group, dataId});
+            path = String.format(CLOUD_PATH_FORMAT, new Object[]{productCode, appName, group, dataId});
         }
 
         this.doRegisterListeners(productCode, appName, path, group, dataId, listener);
     }
 
+    /**
+     * 清空该path的所有监听器    目前仅用于 集群发现
+     * @param path
+     */
     public void removeListeners(String path) {
+        //清空此cache的监听器（only one）
         ((PathChildrenCache)this.pathChildrenCacheMap.get(path)).getListenable().clear();
     }
 
+    /**
+     * 注册 集群发现path的监听器      目前仅用于 集群发现
+     * @param path
+     * @param listener
+     */
     public void registerListeners(String path, final IChangeListener listener) {
         CuratorFramework client = this.zkIp == null?ZKClient.getClient():ZKClientManager.getClient(this.zkIp);
+        //使用Curator的NodeCache来做ZNode的监听，不用我们自己实现重复监听
         if(this.pathChildrenCacheMap.get(path) == null) {
             PathChildrenCache cache = new PathChildrenCache(client, path, true);
             this.pathChildrenCacheMap.putIfAbsent(path, cache);
@@ -161,7 +221,7 @@ public class DynConfigClient {
 
         try {
             if(client.checkExists().forPath(path) == null && productCode != null) {
-               cloud_path = String.format("/configs/%s/%s/%s/%s", new Object[]{productCode, appName, group, dataId});
+               cloud_path = String.format(CLOUD_PATH_FORMAT, new Object[]{productCode, appName, group, dataId});
             }
         } catch (Exception var13) {
             logger.error("doRegisterListeners error", var13);
@@ -169,6 +229,7 @@ public class DynConfigClient {
 
         final String cloud_path_final = cloud_path;
 
+        //使用Curator的NodeCache来做ZNode的监听，不用我们自己实现重复监听
         final NodeCache cache = new NodeCache(client, cloud_path);
         cache.getListenable().addListener(new NodeCacheListener() {
             public void nodeChanged() throws Exception {
@@ -182,11 +243,13 @@ public class DynConfigClient {
                     data1 = ZKRecoverUtil.loadRecoverData(cloud_path_final);
                 }
 
+                //具体的业务处理
                 if(data1 != null) {
                     Configuration configuration = new Configuration();
                     configuration.setConfig(new String(data1));
                     configuration.setGroup(group);
                     configuration.setDataId(dataId);
+                    //对动态变化的数据进行容灾处理
                     ZKRecoverUtil.doRecover(data1, cloud_path_final, DynConfigClient.this.recoverDataCache);
                     listener.receiveConfigInfo(configuration);
                 }
@@ -202,12 +265,15 @@ public class DynConfigClient {
 
     }
 
+    /**
+     * 原生zk监听器注册
+     * @param zkClient
+     */
     private void innerRegisterListeners(CuratorFramework zkClient) {
         zkClient.getConnectionStateListenable().addListener(new ConnectionStateListener() {
             public void stateChanged(CuratorFramework client, ConnectionState newState) {
                 DynConfigClient.logger.info("CuratorFramework state changed: {}", newState);
                 if(newState != ConnectionState.CONNECTED && newState == ConnectionState.RECONNECTED) {
-                    ;
                 }
 
             }
