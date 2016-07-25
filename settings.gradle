@@ -1,0 +1,11 @@
+rootProject.name = 'cloudstack'
+include 'cs-cache'
+include 'cs-client-core'
+include 'cs-clustermanager-client'
+include 'cs-common'
+include 'cs-context'
+include 'cs-dynconfig-client'
+include 'cs-monitor-client'
+include 'cs-spring-redis'
+include 'cs-spring-zkconfig'
+

@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:cache="http://www.springframework.org/schema/cache"
+       xmlns:context="http://www.springframework.org/schema/context" xmlns:p="http://www.springframework.org/schema/p"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xsi:schemaLocation="http://www.springframework.org/schema/beans
+http://www.springframework.org/schema/beans/spring-beans-3.0.xsd
+http://www.springframework.org/schema/cache
+http://www.springframework.org/schema/cache/spring-cache.xsd
+http://www.springframework.org/schema/context
+http://www.springframework.org/schema/context/spring-context-3.0.xsd
+">
+    <description>业务cache框架默认设置</description>
+
+    <import resource="classpath*:spring-redis.xml" />
+    <!--<import resource="classpath*:spring-monitor.xml" />-->
+    <cache:annotation-driven cache-manager="cacheManager" cache-resolver="classNamedCacheResolver" />
+
+    <bean id="classNamedCacheResolver" class="com.kong.cache.spring.ClassNamedCacheResolver">
+        <property name="cacheManager" ref="cacheManager" />
+    </bean>
+
+    <bean id="guavaCacheManager" class="org.springframework.cache.guava.GuavaCacheManager">
+        <property name="cacheBuilder" ref="cacheBuilder" />
+    </bean>
+
+    <bean id="cacheBuilder" class="com.google.common.cache.CacheBuilder" factory-method="from">
+        <!-- maximumSize缓存的最大条目；expireAfterAccess 访问后多久失效；expireAfterWrite 写入后多久失效  -->
+        <constructor-arg value="maximumSize=${guava.maximumSize}, expireAfterAccess=${guava.expireAfterAccess}, expireAfterWrite=${guava.expireAfterWrite}" />
+    </bean>
+
+    <bean id="cacheManager" class="com.kong.cache.spring.HybirdCacheManager">
+        <property name="l1CacheManager" ref="guavaCacheManager"/>
+        <property name="l2CacheManager" ref="redisCacheManager"/>
+        <!--<property name="sfCountMonitorEvent" ref="sfCountMonitorEvent"/>-->
+    </bean>
+
+
+</beans>

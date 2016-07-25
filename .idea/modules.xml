@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="ProjectModuleManager">
+    <modules>
+      <module fileurl="file://$PROJECT_DIR$/cloudstack.iml" filepath="$PROJECT_DIR$/cloudstack.iml" />
+      <module fileurl="file://$PROJECT_DIR$/cs-cache/cs-cache.iml" filepath="$PROJECT_DIR$/cs-cache/cs-cache.iml" />
+      <module fileurl="file://$PROJECT_DIR$/cs-client-core/cs-client-core.iml" filepath="$PROJECT_DIR$/cs-client-core/cs-client-core.iml" />
+      <module fileurl="file://$PROJECT_DIR$/cs-clustermanager-client/cs-clustermanager-client.iml" filepath="$PROJECT_DIR$/cs-clustermanager-client/cs-clustermanager-client.iml" />
+      <module fileurl="file://$PROJECT_DIR$/cs-common/cs-common.iml" filepath="$PROJECT_DIR$/cs-common/cs-common.iml" />
+      <module fileurl="file://$PROJECT_DIR$/cs-context/cs-context.iml" filepath="$PROJECT_DIR$/cs-context/cs-context.iml" />
+      <module fileurl="file://$PROJECT_DIR$/cs-dynconfig-client/cs-dynconfig-client.iml" filepath="$PROJECT_DIR$/cs-dynconfig-client/cs-dynconfig-client.iml" />
+      <module fileurl="file://$PROJECT_DIR$/cs-monitor-client/cs-monitor-client.iml" filepath="$PROJECT_DIR$/cs-monitor-client/cs-monitor-client.iml" />
+      <module fileurl="file://$PROJECT_DIR$/cs-spring-redis/cs-spring-redis.iml" filepath="$PROJECT_DIR$/cs-spring-redis/cs-spring-redis.iml" />
+      <module fileurl="file://$PROJECT_DIR$/cs-spring-zkconfig/cs-spring-zkconfig.iml" filepath="$PROJECT_DIR$/cs-spring-zkconfig/cs-spring-zkconfig.iml" />
+    </modules>
+  </component>
+</project>
