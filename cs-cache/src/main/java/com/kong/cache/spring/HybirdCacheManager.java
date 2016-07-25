@@ -11,10 +11,12 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.LinkedHashSet;
 /**
+ * 缓存管理器
  * Created by kong on 2016/1/22.
  */
 public class HybirdCacheManager implements CacheManager {
     private boolean allowNullValues = true;
+    /** l1 cache manager 目前写死为guava */
     private GuavaCacheManager l1CacheManager;
     private RedisCacheManager l2CacheManager;
     private SFCountMonitorEvent sfCountMonitorEvent;
@@ -48,6 +50,7 @@ public class HybirdCacheManager implements CacheManager {
     }
 
     protected Cache createHybirdCache(Cache l1Cache, Cache l2Cache, String name) {
+        //生成两个级别的Cache
         return new HybirdCache(name, l1Cache, l2Cache, this.isAllowNullValues(), this.sfCountMonitorEvent);
     }
 

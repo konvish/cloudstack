@@ -3,10 +3,10 @@
   <component name="ChangeListManager">
     <list default="true" id="13c61351-47f5-4357-a438-65396c0f2c49" name="Default" comment="">
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/.idea/workspace.xml" afterPath="$PROJECT_DIR$/.idea/workspace.xml" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/cs-dynconfig-client/src/main/java/com/kong/cloudstack/dynconfig/ChangeListenerManager.java" afterPath="$PROJECT_DIR$/cs-dynconfig-client/src/main/java/com/kong/cloudstack/dynconfig/ChangeListenerManager.java" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/cs-dynconfig-client/src/main/java/com/kong/cloudstack/dynconfig/DynConfigClientFactory.java" afterPath="$PROJECT_DIR$/cs-dynconfig-client/src/main/java/com/kong/cloudstack/dynconfig/DynConfigClientFactory.java" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/cs-dynconfig-client/src/main/java/com/kong/cloudstack/dynconfig/IChangeListener.java" afterPath="$PROJECT_DIR$/cs-dynconfig-client/src/main/java/com/kong/cloudstack/dynconfig/IChangeListener.java" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/cs-dynconfig-client/src/main/java/com/kong/cloudstack/dynconfig/domain/Configuration.java" afterPath="$PROJECT_DIR$/cs-dynconfig-client/src/main/java/com/kong/cloudstack/dynconfig/domain/Configuration.java" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/cs-cache/src/main/java/com/kong/cache/spring/CacheConstants.java" afterPath="$PROJECT_DIR$/cs-cache/src/main/java/com/kong/cache/spring/CacheConstants.java" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/cs-cache/src/main/java/com/kong/cache/spring/ClassNamedCacheResolver.java" afterPath="$PROJECT_DIR$/cs-cache/src/main/java/com/kong/cache/spring/ClassNamedCacheResolver.java" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/cs-cache/src/main/java/com/kong/cache/spring/HybirdCache.java" afterPath="$PROJECT_DIR$/cs-cache/src/main/java/com/kong/cache/spring/HybirdCache.java" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/cs-cache/src/main/java/com/kong/cache/spring/HybirdCacheManager.java" afterPath="$PROJECT_DIR$/cs-cache/src/main/java/com/kong/cache/spring/HybirdCacheManager.java" />
     </list>
     <ignored path="cloudstack.iws" />
     <ignored path=".idea/workspace.xml" />
@@ -62,20 +62,7 @@
     <favorites_list name="cloudstack" />
   </component>
   <component name="FileEditorManager">
-    <leaf SIDE_TABS_SIZE_LIMIT_KEY="300">
-      <file leaf-file-name="IChangeListener.java" pinned="false" current-in-tab="true">
-        <entry file="file://$PROJECT_DIR$/cs-dynconfig-client/src/main/java/com/kong/cloudstack/dynconfig/IChangeListener.java">
-          <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="255">
-              <caret line="15" column="7" selection-start-line="15" selection-start-column="7" selection-end-line="15" selection-end-column="7" />
-              <folding>
-                <element signature="imports" expanded="true" />
-              </folding>
-            </state>
-          </provider>
-        </entry>
-      </file>
-    </leaf>
+    <leaf SIDE_TABS_SIZE_LIMIT_KEY="300" />
   </component>
   <component name="FileTemplateManagerImpl">
     <option name="RECENT_TEMPLATES">
@@ -2196,10 +2183,6 @@
   <component name="IdeDocumentHistory">
     <option name="CHANGED_PATHS">
       <list>
-        <option value="$PROJECT_DIR$/cs-monitor-client/src/main/java/org/apache/sirona/store/tracking/DefaultPathTrackingDataStore.java" />
-        <option value="$PROJECT_DIR$/cs-monitor-client/src/main/java/org/apache/sirona/store/tracking/DelegatedCollectorPathTrackingDataStore.java" />
-        <option value="$PROJECT_DIR$/cs-monitor-client/src/main/java/org/apache/sirona/store/tracking/InMemoryPathTrackingDataStore.java" />
-        <option value="$PROJECT_DIR$/cs-monitor-client/src/main/java/org/apache/sirona/store/tracking/PathTrackingDataStore.java" />
         <option value="$PROJECT_DIR$/cs-monitor-client/src/main/java/org/apache/sirona/store/DelegateDataStoreFactory.java" />
         <option value="$PROJECT_DIR$/cs-monitor-client/src/main/java/org/apache/sirona/store/DefaultDataStoreFactory.java" />
         <option value="$PROJECT_DIR$/cs-monitor-client/src/main/java/org/apache/sirona/store/DataStoreFactory.java" />
@@ -2247,6 +2230,10 @@
         <option value="$PROJECT_DIR$/cs-dynconfig-client/src/main/java/com/kong/cloudstack/dynconfig/DynConfigClientFactory.java" />
         <option value="$PROJECT_DIR$/cs-dynconfig-client/src/main/java/com/kong/cloudstack/dynconfig/IChangeListener.java" />
         <option value="$PROJECT_DIR$/cs-dynconfig-client/src/main/java/com/kong/cloudstack/dynconfig/domain/Configuration.java" />
+        <option value="$PROJECT_DIR$/cs-cache/src/main/java/com/kong/cache/spring/CacheConstants.java" />
+        <option value="$PROJECT_DIR$/cs-cache/src/main/java/com/kong/cache/spring/ClassNamedCacheResolver.java" />
+        <option value="$PROJECT_DIR$/cs-cache/src/main/java/com/kong/cache/spring/HybirdCache.java" />
+        <option value="$PROJECT_DIR$/cs-cache/src/main/java/com/kong/cache/spring/HybirdCacheManager.java" />
       </list>
     </option>
   </component>
@@ -2264,9 +2251,10 @@
     </option>
   </component>
   <component name="ProjectFrameBounds">
-    <option name="x" value="318" />
+    <option name="x" value="699" />
+    <option name="y" value="30" />
     <option name="width" value="1277" />
-    <option name="height" value="1040" />
+    <option name="height" value="1013" />
   </component>
   <component name="ProjectLevelVcsManager" settingsEditedManually="true">
     <OptionsSetting value="true" id="Add" />
@@ -2668,7 +2656,7 @@
       <workItem from="1453994127136" duration="596000" />
       <workItem from="1455715990076" duration="1203000" />
       <workItem from="1455717228629" duration="571000" />
-      <workItem from="1469436353976" duration="3501000" />
+      <workItem from="1469436353976" duration="4003000" />
     </task>
     <task id="LOCAL-00001" summary="修改依赖支持">
       <created>1469438348648</created>
@@ -2684,14 +2672,21 @@
       <option name="project" value="LOCAL" />
       <updated>1469439215637</updated>
     </task>
-    <option name="localTasksCounter" value="3" />
+    <task id="LOCAL-00003" summary="增加cs-dynconfig-client的注释">
+      <created>1469439938618</created>
+      <option name="number" value="00003" />
+      <option name="presentableId" value="LOCAL-00003" />
+      <option name="project" value="LOCAL" />
+      <updated>1469439938618</updated>
+    </task>
+    <option name="localTasksCounter" value="4" />
     <servers />
   </component>
   <component name="TimeTrackingManager">
-    <option name="totallyTimeSpent" value="28428000" />
+    <option name="totallyTimeSpent" value="28930000" />
   </component>
   <component name="ToolWindowManager">
-    <frame x="318" y="0" width="1277" height="1040" extended-state="0" />
+    <frame x="699" y="30" width="1277" height="1013" extended-state="0" />
     <editor active="false" />
     <layout>
       <window_info id="Palette" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="3" side_tool="false" content_ui="tabs" />
@@ -2730,7 +2725,8 @@
   <component name="VcsManagerConfiguration">
     <MESSAGE value="修改依赖支持" />
     <MESSAGE value="增加注释" />
-    <option name="LAST_COMMIT_MESSAGE" value="增加注释" />
+    <MESSAGE value="增加cs-dynconfig-client的注释" />
+    <option name="LAST_COMMIT_MESSAGE" value="增加cs-dynconfig-client的注释" />
   </component>
   <component name="XDebuggerManager">
     <breakpoint-manager>
@@ -2790,6 +2786,7 @@
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="0">
           <caret line="15" column="30" selection-start-line="15" selection-start-column="30" selection-end-line="15" selection-end-column="30" />
+          <folding />
         </state>
       </provider>
     </entry>
@@ -2819,44 +2816,10 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/cs-cache/src/main/java/com/kong/cache/spring/CacheConstants.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="85">
-          <caret line="5" column="13" selection-start-line="5" selection-start-column="13" selection-end-line="5" selection-end-column="13" />
-          <folding />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/cs-cache/src/main/java/com/kong/cache/spring/ClassNamedCacheResolver.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="68">
-          <caret line="9" column="17" selection-start-line="9" selection-start-column="17" selection-end-line="9" selection-end-column="17" />
-          <folding />
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/cs-cache/build.gradle">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="68">
           <caret line="4" column="39" selection-start-line="4" selection-start-column="39" selection-end-line="4" selection-end-column="39" />
-          <folding />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/cs-cache/src/main/java/com/kong/cache/spring/HybirdCache.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="340">
-          <caret line="20" column="25" selection-start-line="20" selection-start-column="25" selection-end-line="20" selection-end-column="25" />
-          <folding>
-            <element signature="imports" expanded="false" />
-          </folding>
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/cs-cache/src/main/java/com/kong/cache/spring/HybirdCacheManager.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="102">
-          <caret line="15" column="13" selection-start-line="15" selection-start-column="13" selection-end-line="15" selection-end-column="13" />
           <folding />
         </state>
       </provider>
@@ -2874,7 +2837,7 @@
         <state relative-caret-position="408">
           <caret line="24" column="30" selection-start-line="24" selection-start-column="30" selection-end-line="24" selection-end-column="30" />
           <folding>
-            <element signature="imports" expanded="true" />
+            <element signature="imports" expanded="false" />
           </folding>
         </state>
       </provider>
@@ -3100,8 +3063,40 @@
         <state relative-caret-position="255">
           <caret line="15" column="7" selection-start-line="15" selection-start-column="7" selection-end-line="15" selection-end-column="7" />
           <folding>
-            <element signature="imports" expanded="true" />
+            <element signature="imports" expanded="false" />
           </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/cs-cache/src/main/java/com/kong/cache/spring/CacheConstants.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="102">
+          <caret line="6" column="11" selection-start-line="6" selection-start-column="11" selection-end-line="6" selection-end-column="11" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/cs-cache/src/main/java/com/kong/cache/spring/ClassNamedCacheResolver.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="340">
+          <caret line="27" column="22" selection-start-line="27" selection-start-column="22" selection-end-line="27" selection-end-column="22" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/cs-cache/src/main/java/com/kong/cache/spring/HybirdCacheManager.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="68">
+          <caret line="13" column="8" selection-start-line="13" selection-start-column="8" selection-end-line="13" selection-end-column="8" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/cs-cache/src/main/java/com/kong/cache/spring/HybirdCache.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="850">
+          <caret line="60" column="64" selection-start-line="60" selection-start-column="64" selection-end-line="60" selection-end-column="64" />
+          <folding />
         </state>
       </provider>
     </entry>
