@@ -5,6 +5,10 @@ import org.apache.curator.framework.CuratorFramework;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
 
+/**
+ * zk client管理类
+ * Created by kong on 2016/1/22.
+ */
 public class ZKClientManager {
     private static ConcurrentMap<String, CuratorFramework> zkClientMap = new ConcurrentHashMap();
 

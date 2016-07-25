@@ -3,10 +3,9 @@
   <component name="ChangeListManager">
     <list default="true" id="13c61351-47f5-4357-a438-65396c0f2c49" name="Default" comment="">
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/.idea/workspace.xml" afterPath="$PROJECT_DIR$/.idea/workspace.xml" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/cs-cache/src/main/java/com/kong/cache/spring/CacheConstants.java" afterPath="$PROJECT_DIR$/cs-cache/src/main/java/com/kong/cache/spring/CacheConstants.java" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/cs-cache/src/main/java/com/kong/cache/spring/ClassNamedCacheResolver.java" afterPath="$PROJECT_DIR$/cs-cache/src/main/java/com/kong/cache/spring/ClassNamedCacheResolver.java" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/cs-cache/src/main/java/com/kong/cache/spring/HybirdCache.java" afterPath="$PROJECT_DIR$/cs-cache/src/main/java/com/kong/cache/spring/HybirdCache.java" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/cs-cache/src/main/java/com/kong/cache/spring/HybirdCacheManager.java" afterPath="$PROJECT_DIR$/cs-cache/src/main/java/com/kong/cache/spring/HybirdCacheManager.java" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/cs-client-core/src/main/java/com/kong/cloudstack/client/zookeeper/ZKClient.java" afterPath="$PROJECT_DIR$/cs-client-core/src/main/java/com/kong/cloudstack/client/zookeeper/ZKClient.java" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/cs-client-core/src/main/java/com/kong/cloudstack/client/zookeeper/ZKClientManager.java" afterPath="$PROJECT_DIR$/cs-client-core/src/main/java/com/kong/cloudstack/client/zookeeper/ZKClientManager.java" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/cs-client-core/src/main/java/com/kong/cloudstack/client/zookeeper/recover/ZKRecoverUtil.java" afterPath="$PROJECT_DIR$/cs-client-core/src/main/java/com/kong/cloudstack/client/zookeeper/recover/ZKRecoverUtil.java" />
     </list>
     <ignored path="cloudstack.iws" />
     <ignored path=".idea/workspace.xml" />
@@ -62,7 +61,18 @@
     <favorites_list name="cloudstack" />
   </component>
   <component name="FileEditorManager">
-    <leaf SIDE_TABS_SIZE_LIMIT_KEY="300" />
+    <leaf SIDE_TABS_SIZE_LIMIT_KEY="300">
+      <file leaf-file-name="ZKClientManager.java" pinned="false" current-in-tab="true">
+        <entry file="file://$PROJECT_DIR$/cs-client-core/src/main/java/com/kong/cloudstack/client/zookeeper/ZKClientManager.java">
+          <provider selected="true" editor-type-id="text-editor">
+            <state relative-caret-position="323">
+              <caret line="22" column="67" selection-start-line="22" selection-start-column="67" selection-end-line="22" selection-end-column="67" />
+              <folding />
+            </state>
+          </provider>
+        </entry>
+      </file>
+    </leaf>
   </component>
   <component name="FileTemplateManagerImpl">
     <option name="RECENT_TEMPLATES">
@@ -2183,8 +2193,6 @@
   <component name="IdeDocumentHistory">
     <option name="CHANGED_PATHS">
       <list>
-        <option value="$PROJECT_DIR$/cs-monitor-client/src/main/java/org/apache/sirona/store/DelegateDataStoreFactory.java" />
-        <option value="$PROJECT_DIR$/cs-monitor-client/src/main/java/org/apache/sirona/store/DefaultDataStoreFactory.java" />
         <option value="$PROJECT_DIR$/cs-monitor-client/src/main/java/org/apache/sirona/store/DataStoreFactory.java" />
         <option value="$PROJECT_DIR$/cs-monitor-client/src/main/java/org/apache/sirona/store/CollectorDataStoreFactory.java" />
         <option value="$PROJECT_DIR$/cs-monitor-client/src/main/java/org/apache/sirona/store/BatchFuture.java" />
@@ -2216,7 +2224,6 @@
         <option value="$PROJECT_DIR$/cs-spring-zkconfig/src/main/java/com/kong/cloudstack/sz/ZookeeperResource.java" />
         <option value="$PROJECT_DIR$/dependencies.gradle" />
         <option value="$PROJECT_DIR$/cs-cache/src/main/resources/spring-cache.xml" />
-        <option value="$PROJECT_DIR$/cs-client-core/src/main/java/com/kong/cloudstack/client/zookeeper/ZKClient.java" />
         <option value="$PROJECT_DIR$/cs-clustermanager-client/src/main/java/com/kong/cloudstack/cmc/impl/MultiZKListenerClient.java" />
         <option value="$PROJECT_DIR$/build.gradle" />
         <option value="$PROJECT_DIR$/cs-context/build.gradle" />
@@ -2234,6 +2241,9 @@
         <option value="$PROJECT_DIR$/cs-cache/src/main/java/com/kong/cache/spring/ClassNamedCacheResolver.java" />
         <option value="$PROJECT_DIR$/cs-cache/src/main/java/com/kong/cache/spring/HybirdCache.java" />
         <option value="$PROJECT_DIR$/cs-cache/src/main/java/com/kong/cache/spring/HybirdCacheManager.java" />
+        <option value="$PROJECT_DIR$/cs-client-core/src/main/java/com/kong/cloudstack/client/zookeeper/recover/ZKRecoverUtil.java" />
+        <option value="$PROJECT_DIR$/cs-client-core/src/main/java/com/kong/cloudstack/client/zookeeper/ZKClient.java" />
+        <option value="$PROJECT_DIR$/cs-client-core/src/main/java/com/kong/cloudstack/client/zookeeper/ZKClientManager.java" />
       </list>
     </option>
   </component>
@@ -2251,10 +2261,9 @@
     </option>
   </component>
   <component name="ProjectFrameBounds">
-    <option name="x" value="699" />
-    <option name="y" value="30" />
+    <option name="x" value="482" />
     <option name="width" value="1277" />
-    <option name="height" value="1013" />
+    <option name="height" value="1040" />
   </component>
   <component name="ProjectLevelVcsManager" settingsEditedManually="true">
     <OptionsSetting value="true" id="Add" />
@@ -2656,7 +2665,7 @@
       <workItem from="1453994127136" duration="596000" />
       <workItem from="1455715990076" duration="1203000" />
       <workItem from="1455717228629" duration="571000" />
-      <workItem from="1469436353976" duration="4003000" />
+      <workItem from="1469436353976" duration="4453000" />
     </task>
     <task id="LOCAL-00001" summary="修改依赖支持">
       <created>1469438348648</created>
@@ -2679,14 +2688,21 @@
       <option name="project" value="LOCAL" />
       <updated>1469439938618</updated>
     </task>
-    <option name="localTasksCounter" value="4" />
+    <task id="LOCAL-00004" summary="增加cs-cache的注释">
+      <created>1469440430316</created>
+      <option name="number" value="00004" />
+      <option name="presentableId" value="LOCAL-00004" />
+      <option name="project" value="LOCAL" />
+      <updated>1469440430316</updated>
+    </task>
+    <option name="localTasksCounter" value="5" />
     <servers />
   </component>
   <component name="TimeTrackingManager">
-    <option name="totallyTimeSpent" value="28930000" />
+    <option name="totallyTimeSpent" value="29380000" />
   </component>
   <component name="ToolWindowManager">
-    <frame x="699" y="30" width="1277" height="1013" extended-state="0" />
+    <frame x="482" y="0" width="1277" height="1040" extended-state="0" />
     <editor active="false" />
     <layout>
       <window_info id="Palette" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="3" side_tool="false" content_ui="tabs" />
@@ -2726,7 +2742,8 @@
     <MESSAGE value="修改依赖支持" />
     <MESSAGE value="增加注释" />
     <MESSAGE value="增加cs-dynconfig-client的注释" />
-    <option name="LAST_COMMIT_MESSAGE" value="增加cs-dynconfig-client的注释" />
+    <MESSAGE value="增加cs-cache的注释" />
+    <option name="LAST_COMMIT_MESSAGE" value="增加cs-cache的注释" />
   </component>
   <component name="XDebuggerManager">
     <breakpoint-manager>
@@ -2828,32 +2845,6 @@
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="51">
           <caret line="3" column="31" selection-start-line="3" selection-start-column="31" selection-end-line="3" selection-end-column="31" />
-          <folding />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/cs-client-core/src/main/java/com/kong/cloudstack/client/zookeeper/recover/ZKRecoverUtil.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="408">
-          <caret line="24" column="30" selection-start-line="24" selection-start-column="30" selection-end-line="24" selection-end-column="30" />
-          <folding>
-            <element signature="imports" expanded="false" />
-          </folding>
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/cs-client-core/src/main/java/com/kong/cloudstack/client/zookeeper/ZKClient.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="23">
-          <caret line="28" column="50" selection-start-line="28" selection-start-column="50" selection-end-line="28" selection-end-column="50" />
-          <folding />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/cs-client-core/src/main/java/com/kong/cloudstack/client/zookeeper/ZKClientManager.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="68">
-          <caret line="7" column="13" selection-start-line="7" selection-start-column="13" selection-end-line="7" selection-end-column="13" />
           <folding />
         </state>
       </provider>
@@ -3096,6 +3087,30 @@
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="850">
           <caret line="60" column="64" selection-start-line="60" selection-start-column="64" selection-end-line="60" selection-end-column="64" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/cs-client-core/src/main/java/com/kong/cloudstack/client/zookeeper/recover/ZKRecoverUtil.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="689">
+          <caret line="74" column="19" selection-start-line="74" selection-start-column="19" selection-end-line="74" selection-end-column="19" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/cs-client-core/src/main/java/com/kong/cloudstack/client/zookeeper/ZKClient.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="85">
+          <caret line="14" column="3" selection-start-line="14" selection-start-column="3" selection-end-line="14" selection-end-column="32" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/cs-client-core/src/main/java/com/kong/cloudstack/client/zookeeper/ZKClientManager.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="323">
+          <caret line="22" column="67" selection-start-line="22" selection-start-column="67" selection-end-line="22" selection-end-column="67" />
           <folding />
         </state>
       </provider>

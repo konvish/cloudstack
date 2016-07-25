@@ -11,10 +11,12 @@ import org.slf4j.LoggerFactory;
 
 import java.net.UnknownHostException;
 /**
+ * zk客户端
  * Created by kong on 2016/1/22.
  */
 public class ZKClient extends AbstractLifecycle {
     public static final Logger logger = LoggerFactory.getLogger(ZKClient.class);
+    /** 云管理中心域名 */
     public static final String DEFAULT_DOMAIN_NAME = "mc.zk.kong.cn";
     private static volatile CuratorFramework zkClient = null;
 
@@ -26,7 +28,7 @@ public class ZKClient extends AbstractLifecycle {
         String ip = null;
 
         try {
-            ip = NetUtil.getIpByDomain("mc.zk.kong.cn");
+            ip = NetUtil.getIpByDomain(DEFAULT_DOMAIN_NAME);
         } catch (UnknownHostException var3) {
             logger.error("getIpByDomain error!", var3);
             System.exit(-1);
@@ -38,6 +40,11 @@ public class ZKClient extends AbstractLifecycle {
         logger.warn("ZKClient start success!");
     }
 
+    /**
+     * 根据ip获取zk client, 可以直接调用该方法，但不建议 请使用 ZKClientManager 调用
+     * @param ip
+     * @return
+     */
     public static CuratorFramework create(String ip) {
         logger.warn(" start conn zk server {} ", ip);
         CuratorFramework newClient = null;
@@ -58,6 +65,10 @@ public class ZKClient extends AbstractLifecycle {
 
     }
 
+    /**
+     * 获取zk客户端实例（单例）
+     * @return
+     */
     public static CuratorFramework getClient() {
         ZKClient.ZKClientHolder.instance.start();
         return zkClient;
