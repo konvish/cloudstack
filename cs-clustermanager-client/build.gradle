@@ -4,4 +4,7 @@ dependencies {
     compile 'com.alibaba:fastjson:1.2.7'
     compile 'org.apache.curator:curator-x-discovery:3.0.0'
     compile 'org.apache.curator:curator-recipes:3.0.0'
+    compile project(":cs-context")
+    compile project(":cs-dynconfig-client")
+    compile project(":cs-client-core")
 }

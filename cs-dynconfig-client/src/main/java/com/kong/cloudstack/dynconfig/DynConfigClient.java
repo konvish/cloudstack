@@ -22,6 +22,7 @@ import org.apache.curator.framework.state.ConnectionStateListener;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 /**
+ * 动态配置中心客户端
  * Created by kong on 2016/1/24.
  */
 public class DynConfigClient {
@@ -156,15 +157,17 @@ public class DynConfigClient {
 
     private final void doRegisterListeners(String productCode, String appName, String path, final String group, final String dataId, final IChangeListener listener) {
         CuratorFramework client = this.zkIp == null?ZKClient.getClient():ZKClientManager.getClient(this.zkIp);
-        final String cloud_path = path;
+        String cloud_path = path;
 
         try {
             if(client.checkExists().forPath(path) == null && productCode != null) {
-                cloud_path = String.format("/configs/%s/%s/%s/%s", new Object[]{productCode, appName, group, dataId});
+               cloud_path = String.format("/configs/%s/%s/%s/%s", new Object[]{productCode, appName, group, dataId});
             }
         } catch (Exception var13) {
             logger.error("doRegisterListeners error", var13);
         }
+
+        final String cloud_path_final = cloud_path;
 
         final NodeCache cache = new NodeCache(client, cloud_path);
         cache.getListenable().addListener(new NodeCacheListener() {
@@ -175,8 +178,8 @@ public class DynConfigClient {
                 try {
                     data1 = cache.getCurrentData().getData();
                 } catch (Exception var3) {
-                    DynConfigClient.logger.warn("{} loadRecoverData ", cloud_path);
-                    data1 = ZKRecoverUtil.loadRecoverData(cloud_path);
+                    DynConfigClient.logger.warn("{} loadRecoverData ", cloud_path_final);
+                    data1 = ZKRecoverUtil.loadRecoverData(cloud_path_final);
                 }
 
                 if(data1 != null) {
@@ -184,7 +187,7 @@ public class DynConfigClient {
                     configuration.setConfig(new String(data1));
                     configuration.setGroup(group);
                     configuration.setDataId(dataId);
-                    ZKRecoverUtil.doRecover(data1, cloud_path, DynConfigClient.this.recoverDataCache);
+                    ZKRecoverUtil.doRecover(data1, cloud_path_final, DynConfigClient.this.recoverDataCache);
                     listener.receiveConfigInfo(configuration);
                 }
 

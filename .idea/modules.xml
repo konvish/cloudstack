@@ -2,16 +2,36 @@
 <project version="4">
   <component name="ProjectModuleManager">
     <modules>
-      <module fileurl="file://$PROJECT_DIR$/cloudstack.iml" filepath="$PROJECT_DIR$/cloudstack.iml" />
-      <module fileurl="file://$PROJECT_DIR$/cs-cache/cs-cache.iml" filepath="$PROJECT_DIR$/cs-cache/cs-cache.iml" />
-      <module fileurl="file://$PROJECT_DIR$/cs-client-core/cs-client-core.iml" filepath="$PROJECT_DIR$/cs-client-core/cs-client-core.iml" />
-      <module fileurl="file://$PROJECT_DIR$/cs-clustermanager-client/cs-clustermanager-client.iml" filepath="$PROJECT_DIR$/cs-clustermanager-client/cs-clustermanager-client.iml" />
-      <module fileurl="file://$PROJECT_DIR$/cs-common/cs-common.iml" filepath="$PROJECT_DIR$/cs-common/cs-common.iml" />
-      <module fileurl="file://$PROJECT_DIR$/cs-context/cs-context.iml" filepath="$PROJECT_DIR$/cs-context/cs-context.iml" />
-      <module fileurl="file://$PROJECT_DIR$/cs-dynconfig-client/cs-dynconfig-client.iml" filepath="$PROJECT_DIR$/cs-dynconfig-client/cs-dynconfig-client.iml" />
-      <module fileurl="file://$PROJECT_DIR$/cs-monitor-client/cs-monitor-client.iml" filepath="$PROJECT_DIR$/cs-monitor-client/cs-monitor-client.iml" />
-      <module fileurl="file://$PROJECT_DIR$/cs-spring-redis/cs-spring-redis.iml" filepath="$PROJECT_DIR$/cs-spring-redis/cs-spring-redis.iml" />
-      <module fileurl="file://$PROJECT_DIR$/cs-spring-zkconfig/cs-spring-zkconfig.iml" filepath="$PROJECT_DIR$/cs-spring-zkconfig/cs-spring-zkconfig.iml" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/modules/cloudstack.iml" filepath="$PROJECT_DIR$/.idea/modules/cloudstack.iml" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/modules/cloudstack_main.iml" filepath="$PROJECT_DIR$/.idea/modules/cloudstack_main.iml" group="cloudstack" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/modules/cloudstack_test.iml" filepath="$PROJECT_DIR$/.idea/modules/cloudstack_test.iml" group="cloudstack" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/modules/cs-cache/cs-cache.iml" filepath="$PROJECT_DIR$/.idea/modules/cs-cache/cs-cache.iml" group="cs-cache" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/modules/cs-cache/cs-cache_main.iml" filepath="$PROJECT_DIR$/.idea/modules/cs-cache/cs-cache_main.iml" group="cs-cache" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/modules/cs-cache/cs-cache_test.iml" filepath="$PROJECT_DIR$/.idea/modules/cs-cache/cs-cache_test.iml" group="cs-cache" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/modules/cs-client-core/cs-client-core.iml" filepath="$PROJECT_DIR$/.idea/modules/cs-client-core/cs-client-core.iml" group="cs-client-core" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/modules/cs-client-core/cs-client-core_main.iml" filepath="$PROJECT_DIR$/.idea/modules/cs-client-core/cs-client-core_main.iml" group="cs-client-core" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/modules/cs-client-core/cs-client-core_test.iml" filepath="$PROJECT_DIR$/.idea/modules/cs-client-core/cs-client-core_test.iml" group="cs-client-core" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/modules/cs-clustermanager-client/cs-clustermanager-client.iml" filepath="$PROJECT_DIR$/.idea/modules/cs-clustermanager-client/cs-clustermanager-client.iml" group="cs-clustermanager-client" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/modules/cs-clustermanager-client/cs-clustermanager-client_main.iml" filepath="$PROJECT_DIR$/.idea/modules/cs-clustermanager-client/cs-clustermanager-client_main.iml" group="cs-clustermanager-client" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/modules/cs-clustermanager-client/cs-clustermanager-client_test.iml" filepath="$PROJECT_DIR$/.idea/modules/cs-clustermanager-client/cs-clustermanager-client_test.iml" group="cs-clustermanager-client" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/modules/cs-common/cs-common.iml" filepath="$PROJECT_DIR$/.idea/modules/cs-common/cs-common.iml" group="cs-common" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/modules/cs-common/cs-common_main.iml" filepath="$PROJECT_DIR$/.idea/modules/cs-common/cs-common_main.iml" group="cs-common" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/modules/cs-common/cs-common_test.iml" filepath="$PROJECT_DIR$/.idea/modules/cs-common/cs-common_test.iml" group="cs-common" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/modules/cs-context/cs-context.iml" filepath="$PROJECT_DIR$/.idea/modules/cs-context/cs-context.iml" group="cs-context" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/modules/cs-context/cs-context_main.iml" filepath="$PROJECT_DIR$/.idea/modules/cs-context/cs-context_main.iml" group="cs-context" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/modules/cs-context/cs-context_test.iml" filepath="$PROJECT_DIR$/.idea/modules/cs-context/cs-context_test.iml" group="cs-context" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/modules/cs-dynconfig-client/cs-dynconfig-client.iml" filepath="$PROJECT_DIR$/.idea/modules/cs-dynconfig-client/cs-dynconfig-client.iml" group="cs-dynconfig-client" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/modules/cs-dynconfig-client/cs-dynconfig-client_main.iml" filepath="$PROJECT_DIR$/.idea/modules/cs-dynconfig-client/cs-dynconfig-client_main.iml" group="cs-dynconfig-client" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/modules/cs-dynconfig-client/cs-dynconfig-client_test.iml" filepath="$PROJECT_DIR$/.idea/modules/cs-dynconfig-client/cs-dynconfig-client_test.iml" group="cs-dynconfig-client" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/modules/cs-monitor-client/cs-monitor-client.iml" filepath="$PROJECT_DIR$/.idea/modules/cs-monitor-client/cs-monitor-client.iml" group="cs-monitor-client" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/modules/cs-monitor-client/cs-monitor-client_main.iml" filepath="$PROJECT_DIR$/.idea/modules/cs-monitor-client/cs-monitor-client_main.iml" group="cs-monitor-client" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/modules/cs-monitor-client/cs-monitor-client_test.iml" filepath="$PROJECT_DIR$/.idea/modules/cs-monitor-client/cs-monitor-client_test.iml" group="cs-monitor-client" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/modules/cs-spring-redis/cs-spring-redis.iml" filepath="$PROJECT_DIR$/.idea/modules/cs-spring-redis/cs-spring-redis.iml" group="cs-spring-redis" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/modules/cs-spring-redis/cs-spring-redis_main.iml" filepath="$PROJECT_DIR$/.idea/modules/cs-spring-redis/cs-spring-redis_main.iml" group="cs-spring-redis" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/modules/cs-spring-redis/cs-spring-redis_test.iml" filepath="$PROJECT_DIR$/.idea/modules/cs-spring-redis/cs-spring-redis_test.iml" group="cs-spring-redis" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/modules/cs-spring-zkconfig/cs-spring-zkconfig.iml" filepath="$PROJECT_DIR$/.idea/modules/cs-spring-zkconfig/cs-spring-zkconfig.iml" group="cs-spring-zkconfig" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/modules/cs-spring-zkconfig/cs-spring-zkconfig_main.iml" filepath="$PROJECT_DIR$/.idea/modules/cs-spring-zkconfig/cs-spring-zkconfig_main.iml" group="cs-spring-zkconfig" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/modules/cs-spring-zkconfig/cs-spring-zkconfig_test.iml" filepath="$PROJECT_DIR$/.idea/modules/cs-spring-zkconfig/cs-spring-zkconfig_test.iml" group="cs-spring-zkconfig" />
     </modules>
   </component>
 </project>

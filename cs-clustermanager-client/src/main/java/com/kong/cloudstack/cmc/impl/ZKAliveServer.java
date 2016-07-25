@@ -22,7 +22,8 @@ public class ZKAliveServer implements Closeable {
     public ZKAliveServer(CuratorFramework client, String path, String serviceName, String description) throws Exception {
         String formatter = "{%s}://%s:{%d}";
         UriSpec uriSpec = new UriSpec(String.format(formatter, new Object[]{"tcp", NetUtil.getLocalHost(), Integer.valueOf(CloudContextFactory.getCloudContext().getPort())}));
-        this.thisInstance = ServiceInstance.builder().id(CloudContextFactory.getCloudContext().getId()).name(serviceName).payload(new InstanceDetails(description)).port(CloudContextFactory.getCloudContext().getPort()).uriSpec(uriSpec).address(NetUtil.getLocalHost() + "/" + NetUtil.getLocalAddress().getHostName()).build();
+        ServiceInstance<Object> build = ServiceInstance.builder().id(CloudContextFactory.getCloudContext().getId()).name(serviceName).payload(new InstanceDetails(description)).port(CloudContextFactory.getCloudContext().getPort()).uriSpec(uriSpec).address(NetUtil.getLocalHost() + "/" + NetUtil.getLocalAddress().getHostName()).build();
+        this.thisInstance =(ServiceInstance)build;
         JsonInstanceSerializer serializer = new JsonInstanceSerializer(InstanceDetails.class);
         this.serviceDiscovery = ServiceDiscoveryBuilder.builder(InstanceDetails.class).client(client).basePath(path).serializer(serializer).thisInstance(this.thisInstance).build();
     }

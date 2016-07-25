@@ -18,5 +18,27 @@
         <processorPath useClasspath="true" />
       </profile>
     </annotationProcessing>
+    <bytecodeTargetLevel>
+      <module name="cloudstack_main" target="1.8" />
+      <module name="cloudstack_test" target="1.8" />
+      <module name="cs-cache_main" target="1.8" />
+      <module name="cs-cache_test" target="1.8" />
+      <module name="cs-client-core_main" target="1.8" />
+      <module name="cs-client-core_test" target="1.8" />
+      <module name="cs-clustermanager-client_main" target="1.8" />
+      <module name="cs-clustermanager-client_test" target="1.8" />
+      <module name="cs-common_main" target="1.8" />
+      <module name="cs-common_test" target="1.8" />
+      <module name="cs-context_main" target="1.8" />
+      <module name="cs-context_test" target="1.8" />
+      <module name="cs-dynconfig-client_main" target="1.8" />
+      <module name="cs-dynconfig-client_test" target="1.8" />
+      <module name="cs-monitor-client_main" target="1.8" />
+      <module name="cs-monitor-client_test" target="1.8" />
+      <module name="cs-spring-redis_main" target="1.8" />
+      <module name="cs-spring-redis_test" target="1.8" />
+      <module name="cs-spring-zkconfig_main" target="1.8" />
+      <module name="cs-spring-zkconfig_test" target="1.8" />
+    </bytecodeTargetLevel>
   </component>
 </project>
