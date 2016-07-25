@@ -3,7 +3,10 @@
   <component name="ChangeListManager">
     <list default="true" id="13c61351-47f5-4357-a438-65396c0f2c49" name="Default" comment="">
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/.idea/workspace.xml" afterPath="$PROJECT_DIR$/.idea/workspace.xml" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/cs-dynconfig-client/src/main/java/com/kong/cloudstack/dynconfig/DynConfigClient.java" afterPath="$PROJECT_DIR$/cs-dynconfig-client/src/main/java/com/kong/cloudstack/dynconfig/DynConfigClient.java" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/cs-dynconfig-client/src/main/java/com/kong/cloudstack/dynconfig/ChangeListenerManager.java" afterPath="$PROJECT_DIR$/cs-dynconfig-client/src/main/java/com/kong/cloudstack/dynconfig/ChangeListenerManager.java" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/cs-dynconfig-client/src/main/java/com/kong/cloudstack/dynconfig/DynConfigClientFactory.java" afterPath="$PROJECT_DIR$/cs-dynconfig-client/src/main/java/com/kong/cloudstack/dynconfig/DynConfigClientFactory.java" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/cs-dynconfig-client/src/main/java/com/kong/cloudstack/dynconfig/IChangeListener.java" afterPath="$PROJECT_DIR$/cs-dynconfig-client/src/main/java/com/kong/cloudstack/dynconfig/IChangeListener.java" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/cs-dynconfig-client/src/main/java/com/kong/cloudstack/dynconfig/domain/Configuration.java" afterPath="$PROJECT_DIR$/cs-dynconfig-client/src/main/java/com/kong/cloudstack/dynconfig/domain/Configuration.java" />
     </list>
     <ignored path="cloudstack.iws" />
     <ignored path=".idea/workspace.xml" />
@@ -60,11 +63,11 @@
   </component>
   <component name="FileEditorManager">
     <leaf SIDE_TABS_SIZE_LIMIT_KEY="300">
-      <file leaf-file-name="DynConfigClient.java" pinned="false" current-in-tab="true">
-        <entry file="file://$PROJECT_DIR$/cs-dynconfig-client/src/main/java/com/kong/cloudstack/dynconfig/DynConfigClient.java">
+      <file leaf-file-name="IChangeListener.java" pinned="false" current-in-tab="true">
+        <entry file="file://$PROJECT_DIR$/cs-dynconfig-client/src/main/java/com/kong/cloudstack/dynconfig/IChangeListener.java">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="-2922">
-              <caret line="89" column="33" selection-start-line="89" selection-start-column="33" selection-end-line="89" selection-end-column="33" />
+            <state relative-caret-position="255">
+              <caret line="15" column="7" selection-start-line="15" selection-start-column="7" selection-end-line="15" selection-end-column="7" />
               <folding>
                 <element signature="imports" expanded="true" />
               </folding>
@@ -2193,9 +2196,6 @@
   <component name="IdeDocumentHistory">
     <option name="CHANGED_PATHS">
       <list>
-        <option value="$PROJECT_DIR$/cs-monitor-client/src/main/java/org/apache/sirona/store/tracking/AbstractPathTrackingDataStore.java" />
-        <option value="$PROJECT_DIR$/cs-monitor-client/src/main/java/org/apache/sirona/store/tracking/BatchPathTrackingDataStore.java" />
-        <option value="$PROJECT_DIR$/cs-monitor-client/src/main/java/org/apache/sirona/store/tracking/CollectorPathTrackingDataStore.java" />
         <option value="$PROJECT_DIR$/cs-monitor-client/src/main/java/org/apache/sirona/store/tracking/DefaultPathTrackingDataStore.java" />
         <option value="$PROJECT_DIR$/cs-monitor-client/src/main/java/org/apache/sirona/store/tracking/DelegatedCollectorPathTrackingDataStore.java" />
         <option value="$PROJECT_DIR$/cs-monitor-client/src/main/java/org/apache/sirona/store/tracking/InMemoryPathTrackingDataStore.java" />
@@ -2235,7 +2235,6 @@
         <option value="$PROJECT_DIR$/cs-cache/src/main/resources/spring-cache.xml" />
         <option value="$PROJECT_DIR$/cs-client-core/src/main/java/com/kong/cloudstack/client/zookeeper/ZKClient.java" />
         <option value="$PROJECT_DIR$/cs-clustermanager-client/src/main/java/com/kong/cloudstack/cmc/impl/MultiZKListenerClient.java" />
-        <option value="$PROJECT_DIR$/cs-dynconfig-client/src/main/java/com/kong/cloudstack/dynconfig/domain/Configuration.java" />
         <option value="$PROJECT_DIR$/build.gradle" />
         <option value="$PROJECT_DIR$/cs-context/build.gradle" />
         <option value="$PROJECT_DIR$/cs-clustermanager-client/src/main/java/com/kong/cloudstack/cmc/impl/ZKAliveServer.java" />
@@ -2244,6 +2243,10 @@
         <option value="$PROJECT_DIR$/cs-clustermanager-client/build.gradle" />
         <option value="$PROJECT_DIR$/cs-dynconfig-client/build.gradle" />
         <option value="$PROJECT_DIR$/cs-dynconfig-client/src/main/java/com/kong/cloudstack/dynconfig/DynConfigClient.java" />
+        <option value="$PROJECT_DIR$/cs-dynconfig-client/src/main/java/com/kong/cloudstack/dynconfig/ChangeListenerManager.java" />
+        <option value="$PROJECT_DIR$/cs-dynconfig-client/src/main/java/com/kong/cloudstack/dynconfig/DynConfigClientFactory.java" />
+        <option value="$PROJECT_DIR$/cs-dynconfig-client/src/main/java/com/kong/cloudstack/dynconfig/IChangeListener.java" />
+        <option value="$PROJECT_DIR$/cs-dynconfig-client/src/main/java/com/kong/cloudstack/dynconfig/domain/Configuration.java" />
       </list>
     </option>
   </component>
@@ -2261,7 +2264,7 @@
     </option>
   </component>
   <component name="ProjectFrameBounds">
-    <option name="x" value="642" />
+    <option name="x" value="318" />
     <option name="width" value="1277" />
     <option name="height" value="1040" />
   </component>
@@ -2306,124 +2309,6 @@
             </PATH_ELEMENT>
             <PATH_ELEMENT>
               <option name="myItemId" value="cloudstack" />
-              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
-            </PATH_ELEMENT>
-          </PATH>
-          <PATH>
-            <PATH_ELEMENT>
-              <option name="myItemId" value="cloudstack" />
-              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.ProjectViewProjectNode" />
-            </PATH_ELEMENT>
-            <PATH_ELEMENT>
-              <option name="myItemId" value="cloudstack" />
-              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
-            </PATH_ELEMENT>
-            <PATH_ELEMENT>
-              <option name="myItemId" value="cs-dynconfig-client" />
-              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
-            </PATH_ELEMENT>
-          </PATH>
-          <PATH>
-            <PATH_ELEMENT>
-              <option name="myItemId" value="cloudstack" />
-              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.ProjectViewProjectNode" />
-            </PATH_ELEMENT>
-            <PATH_ELEMENT>
-              <option name="myItemId" value="cloudstack" />
-              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
-            </PATH_ELEMENT>
-            <PATH_ELEMENT>
-              <option name="myItemId" value="cs-dynconfig-client" />
-              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
-            </PATH_ELEMENT>
-            <PATH_ELEMENT>
-              <option name="myItemId" value="src" />
-              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
-            </PATH_ELEMENT>
-          </PATH>
-          <PATH>
-            <PATH_ELEMENT>
-              <option name="myItemId" value="cloudstack" />
-              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.ProjectViewProjectNode" />
-            </PATH_ELEMENT>
-            <PATH_ELEMENT>
-              <option name="myItemId" value="cloudstack" />
-              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
-            </PATH_ELEMENT>
-            <PATH_ELEMENT>
-              <option name="myItemId" value="cs-dynconfig-client" />
-              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
-            </PATH_ELEMENT>
-            <PATH_ELEMENT>
-              <option name="myItemId" value="src" />
-              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
-            </PATH_ELEMENT>
-            <PATH_ELEMENT>
-              <option name="myItemId" value="main" />
-              <option name="myItemType" value="org.jetbrains.plugins.gradle.projectView.GradleTreeStructureProvider$GradleSourceSetDirectoryNode" />
-            </PATH_ELEMENT>
-          </PATH>
-          <PATH>
-            <PATH_ELEMENT>
-              <option name="myItemId" value="cloudstack" />
-              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.ProjectViewProjectNode" />
-            </PATH_ELEMENT>
-            <PATH_ELEMENT>
-              <option name="myItemId" value="cloudstack" />
-              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
-            </PATH_ELEMENT>
-            <PATH_ELEMENT>
-              <option name="myItemId" value="cs-dynconfig-client" />
-              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
-            </PATH_ELEMENT>
-            <PATH_ELEMENT>
-              <option name="myItemId" value="src" />
-              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
-            </PATH_ELEMENT>
-            <PATH_ELEMENT>
-              <option name="myItemId" value="main" />
-              <option name="myItemType" value="org.jetbrains.plugins.gradle.projectView.GradleTreeStructureProvider$GradleSourceSetDirectoryNode" />
-            </PATH_ELEMENT>
-            <PATH_ELEMENT>
-              <option name="myItemId" value="java" />
-              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
-            </PATH_ELEMENT>
-            <PATH_ELEMENT>
-              <option name="myItemId" value="dynconfig" />
-              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
-            </PATH_ELEMENT>
-          </PATH>
-          <PATH>
-            <PATH_ELEMENT>
-              <option name="myItemId" value="cloudstack" />
-              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.ProjectViewProjectNode" />
-            </PATH_ELEMENT>
-            <PATH_ELEMENT>
-              <option name="myItemId" value="cloudstack" />
-              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
-            </PATH_ELEMENT>
-            <PATH_ELEMENT>
-              <option name="myItemId" value="cs-dynconfig-client" />
-              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
-            </PATH_ELEMENT>
-            <PATH_ELEMENT>
-              <option name="myItemId" value="src" />
-              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
-            </PATH_ELEMENT>
-            <PATH_ELEMENT>
-              <option name="myItemId" value="main" />
-              <option name="myItemType" value="org.jetbrains.plugins.gradle.projectView.GradleTreeStructureProvider$GradleSourceSetDirectoryNode" />
-            </PATH_ELEMENT>
-            <PATH_ELEMENT>
-              <option name="myItemId" value="java" />
-              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
-            </PATH_ELEMENT>
-            <PATH_ELEMENT>
-              <option name="myItemId" value="dynconfig" />
-              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
-            </PATH_ELEMENT>
-            <PATH_ELEMENT>
-              <option name="myItemId" value="domain" />
               <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
             </PATH_ELEMENT>
           </PATH>
@@ -2783,7 +2668,7 @@
       <workItem from="1453994127136" duration="596000" />
       <workItem from="1455715990076" duration="1203000" />
       <workItem from="1455717228629" duration="571000" />
-      <workItem from="1469436353976" duration="2798000" />
+      <workItem from="1469436353976" duration="3501000" />
     </task>
     <task id="LOCAL-00001" summary="修改依赖支持">
       <created>1469438348648</created>
@@ -2792,15 +2677,22 @@
       <option name="project" value="LOCAL" />
       <updated>1469438348648</updated>
     </task>
-    <option name="localTasksCounter" value="2" />
+    <task id="LOCAL-00002" summary="增加注释">
+      <created>1469439215637</created>
+      <option name="number" value="00002" />
+      <option name="presentableId" value="LOCAL-00002" />
+      <option name="project" value="LOCAL" />
+      <updated>1469439215637</updated>
+    </task>
+    <option name="localTasksCounter" value="3" />
     <servers />
   </component>
   <component name="TimeTrackingManager">
-    <option name="totallyTimeSpent" value="27725000" />
+    <option name="totallyTimeSpent" value="28428000" />
   </component>
   <component name="ToolWindowManager">
-    <frame x="642" y="0" width="1277" height="1040" extended-state="0" />
-    <editor active="true" />
+    <frame x="318" y="0" width="1277" height="1040" extended-state="0" />
+    <editor active="false" />
     <layout>
       <window_info id="Palette" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="3" side_tool="false" content_ui="tabs" />
       <window_info id="TODO" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="6" side_tool="false" content_ui="tabs" />
@@ -2814,7 +2706,7 @@
       <window_info id="Terminal" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="7" side_tool="false" content_ui="tabs" />
       <window_info id="Capture Tool" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="-1" side_tool="false" content_ui="tabs" />
       <window_info id="Designer" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="5" side_tool="false" content_ui="tabs" />
-      <window_info id="Project" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" show_stripe_button="true" weight="0.24692371" sideWeight="0.5" order="0" side_tool="false" content_ui="combo" />
+      <window_info id="Project" active="true" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" show_stripe_button="true" weight="0.24692371" sideWeight="0.5" order="0" side_tool="false" content_ui="combo" />
       <window_info id="Database" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="6" side_tool="false" content_ui="tabs" />
       <window_info id="Gradle" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.1509434" sideWeight="0.5" order="7" side_tool="false" content_ui="tabs" />
       <window_info id="Structure" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.25" sideWeight="0.5" order="1" side_tool="false" content_ui="tabs" />
@@ -2837,7 +2729,8 @@
   </component>
   <component name="VcsManagerConfiguration">
     <MESSAGE value="修改依赖支持" />
-    <option name="LAST_COMMIT_MESSAGE" value="修改依赖支持" />
+    <MESSAGE value="增加注释" />
+    <option name="LAST_COMMIT_MESSAGE" value="增加注释" />
   </component>
   <component name="XDebuggerManager">
     <breakpoint-manager>
@@ -2846,14 +2739,6 @@
     <watches-manager />
   </component>
   <component name="editorHistoryManager">
-    <entry file="file://$PROJECT_DIR$/cs-spring-zkconfig/src/main/java/com/kong/cloudstack/sz/util/EncryptUtil.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="0">
-          <caret line="2" column="34" selection-start-line="2" selection-start-column="34" selection-end-line="2" selection-end-column="34" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="jar://$USER_HOME$/.gradle/caches/modules-2/files-2.1/org.apache.curator/curator-framework/3.0.0/bce269428dc36826acb9067ee33eb99ff92d0adb/curator-framework-3.0.0-sources.jar!/org/apache/curator/framework/api/Watchable.java" />
     <entry file="jar://$USER_HOME$/.gradle/caches/modules-2/files-2.1/org.apache.curator/curator-framework/3.0.0/bce269428dc36826acb9067ee33eb99ff92d0adb/curator-framework-3.0.0-sources.jar!/org/apache/curator/framework/api/Pathable.java" />
     <entry file="jar://$USER_HOME$/.gradle/caches/modules-2/files-2.1/org.apache.curator/curator-framework/3.0.0/bce269428dc36826acb9067ee33eb99ff92d0adb/curator-framework-3.0.0-sources.jar!/org/apache/curator/framework/api/BackgroundPathable.java" />
     <entry file="jar://$USER_HOME$/.gradle/caches/modules-2/files-2.1/org.apache.curator/curator-framework/3.0.0/bce269428dc36826acb9067ee33eb99ff92d0adb/curator-framework-3.0.0-sources.jar!/org/apache/curator/framework/api/ExistsBuilderMain.java" />
@@ -3168,22 +3053,6 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/cs-dynconfig-client/src/main/java/com/kong/cloudstack/dynconfig/domain/Configuration.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="204">
-          <caret line="16" column="24" selection-start-line="16" selection-start-column="24" selection-end-line="16" selection-end-column="24" />
-          <folding />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/cs-dynconfig-client/src/main/java/com/kong/cloudstack/dynconfig/ChangeListenerManager.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="102">
-          <caret line="9" column="13" selection-start-line="9" selection-start-column="13" selection-end-line="9" selection-end-column="13" />
-          <folding />
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/cs-dynconfig-client/build.gradle">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="51">
@@ -3192,10 +3061,44 @@
         </state>
       </provider>
     </entry>
+    <entry file="file://$PROJECT_DIR$/cs-dynconfig-client/src/main/java/com/kong/cloudstack/dynconfig/ChangeListenerManager.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="238">
+          <caret line="19" column="35" selection-start-line="19" selection-start-column="35" selection-end-line="19" selection-end-column="35" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
     <entry file="file://$PROJECT_DIR$/cs-dynconfig-client/src/main/java/com/kong/cloudstack/dynconfig/DynConfigClient.java">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="-2922">
-          <caret line="89" column="33" selection-start-line="89" selection-start-column="33" selection-end-line="89" selection-end-column="33" />
+        <state relative-caret-position="291">
+          <caret line="272" column="49" selection-start-line="272" selection-start-column="49" selection-end-line="272" selection-end-column="49" />
+          <folding>
+            <element signature="imports" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/cs-dynconfig-client/src/main/java/com/kong/cloudstack/dynconfig/DynConfigClientFactory.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="493">
+          <caret line="31" column="0" selection-start-line="31" selection-start-column="0" selection-end-line="31" selection-end-column="0" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/cs-dynconfig-client/src/main/java/com/kong/cloudstack/dynconfig/domain/Configuration.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="816">
+          <caret line="72" column="5" selection-start-line="72" selection-start-column="5" selection-end-line="72" selection-end-column="5" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/cs-dynconfig-client/src/main/java/com/kong/cloudstack/dynconfig/IChangeListener.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="255">
+          <caret line="15" column="7" selection-start-line="15" selection-start-column="7" selection-end-line="15" selection-end-column="7" />
           <folding>
             <element signature="imports" expanded="true" />
           </folding>

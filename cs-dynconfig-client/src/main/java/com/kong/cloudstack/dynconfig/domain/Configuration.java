@@ -6,15 +6,22 @@ import java.io.Serializable;
 import java.util.List;
 import java.util.Map;
 /**
+ * 配置bean
  * Created by kong on 2016/1/24.
  */
 public class Configuration implements Serializable {
     private static final long serialVersionUID = 5578228351252777377L;
+    /** 配置项所在组 */
     private String group;
+    /** 配置项key */
     private String dataId;
+    /** 配置项值 */
     private String config;
+    /** 集群下的所有节点 */
     private List<String> nodes;
+    /** 服务器集群变化的事件 */
     private PathChildrenCacheEvent pathChildrenCacheEvent;
+    /** 节点变化的详情 */
     private Map<String, String> datas;
     private String appName;
 

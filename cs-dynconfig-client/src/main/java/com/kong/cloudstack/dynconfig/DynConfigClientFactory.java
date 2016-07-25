@@ -4,6 +4,7 @@ import com.kong.cloudstack.dynconfig.DynConfigClient;
 import com.google.common.collect.Maps;
 import java.util.concurrent.ConcurrentMap;
 /**
+ * DynConfigClient工厂类
  * Created by kong on 2016/1/24.
  */
 public class DynConfigClientFactory {
