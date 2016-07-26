@@ -4,6 +4,7 @@ import com.kong.cloudstack.ILifecycle;
 import com.kong.cloudstack.context.ICloudContext;
 import com.kong.cloudstack.context.impl.CloudContextImpl;
 /**
+ * ICloudContext 工厂类
  * Created by kong on 2016/1/24.
  */
 public class CloudContextFactory {
