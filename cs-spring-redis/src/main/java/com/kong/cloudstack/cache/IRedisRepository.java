@@ -7,6 +7,7 @@ import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.TimeUnit;
 /**
+ *
  * Created by kong on 2016/1/24.
  */
 public interface IRedisRepository<K, V> {

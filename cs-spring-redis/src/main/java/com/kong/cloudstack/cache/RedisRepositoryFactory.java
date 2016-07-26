@@ -1,17 +1,15 @@
 package com.kong.cloudstack.cache;
 
-import com.kong.cloudstack.cache.IRedisRepository;
-import com.kong.cloudstack.cache.RedisManagerRepository;
-import com.kong.cloudstack.cache.RedisRepository;
-import com.kong.cloudstack.cache.SimpleRedisRepositoryFactory;
 import com.kong.cloudstack.dynconfig.DynConfigClient;
 import com.kong.cloudstack.dynconfig.DynConfigClientFactory;
+
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.util.Map;
 import java.util.Properties;
 import java.util.concurrent.ConcurrentHashMap;
 /**
+ *
  * Created by kong on 2016/1/24.
  */
 public class RedisRepositoryFactory {

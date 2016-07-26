@@ -18,6 +18,8 @@ import org.springframework.data.redis.core.BoundZSetOperations;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Repository;
 /**
+ * 基于spring集成Jedis template，在applicationContext-redis中配置
+ * 在RedisTemplate外又封装了一层，实现了RedisAPIs接口
  * Created by kong on 2016/1/24.
  */
 @Repository("redisRepository")
@@ -79,12 +81,12 @@ public class RedisRepository<K, V> implements IRedisRepository<K, V> {
 
     public V get(K key) {
         BoundValueOperations ops = this.getBoundValueOps(key);
-        return ops.get();
+        return (V)ops.get();
     }
 
     public V getSet(K key, V value) {
         BoundValueOperations ops = this.getBoundValueOps(key);
-        return ops.getAndSet(value);
+        return (V)ops.getAndSet(value);
     }
 
     public Long incr(K key, long delta) {
@@ -119,7 +121,7 @@ public class RedisRepository<K, V> implements IRedisRepository<K, V> {
 
     public V hGet(K key, K hKey) {
         BoundHashOperations ops = this.getBoundHashOps(key);
-        return ops.get(hKey);
+        return (V)ops.get(hKey);
     }
 
     public Set<K> hKeys(K key) {
@@ -149,7 +151,7 @@ public class RedisRepository<K, V> implements IRedisRepository<K, V> {
 
     public V lIndex(K key, long index) {
         BoundListOperations ops = this.getBoundListOps(key);
-        return ops.index(index);
+        return (V)ops.index(index);
     }
 
     public void lInsert(K key, long index, V value) {
@@ -164,12 +166,12 @@ public class RedisRepository<K, V> implements IRedisRepository<K, V> {
 
     public V lPop(K key) {
         BoundListOperations ops = this.getBoundListOps(key);
-        return ops.leftPop();
+        return (V)ops.leftPop();
     }
 
     public V lPop(K key, long timeout, TimeUnit unit) {
         BoundListOperations ops = this.getBoundListOps(key);
-        return ops.leftPop(timeout, unit);
+        return (V)ops.leftPop(timeout, unit);
     }
 
     public Long lPush(K key, V value) {
@@ -204,7 +206,7 @@ public class RedisRepository<K, V> implements IRedisRepository<K, V> {
 
     public V rPop(K key) {
         BoundListOperations ops = this.getBoundListOps(key);
-        return ops.rightPop();
+        return (V)ops.rightPop();
     }
 
     public Long sAdd(K key, V value) {
@@ -229,7 +231,7 @@ public class RedisRepository<K, V> implements IRedisRepository<K, V> {
 
     public V sPop(K key) {
         BoundSetOperations ops = this.getBoundSetOps(key);
-        return ops.pop();
+        return (V)ops.pop();
     }
 
     public Long sRem(K key, V value) {

@@ -1,15 +1,7 @@
 package com.kong.cloudstack.cache;
 
-import com.kong.cloudstack.cache.RedisManagerRepository;
-import com.kong.cloudstack.cache.RedisRepository;
 import com.kong.cloudstack.dynconfig.DynConfigClient;
 import com.kong.cloudstack.dynconfig.DynConfigClientFactory;
-import java.io.ByteArrayInputStream;
-import java.io.IOException;
-import java.util.HashSet;
-import java.util.Iterator;
-import java.util.LinkedList;
-import java.util.Properties;
 import org.springframework.data.redis.connection.jedis.JedisConnectionFactory;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.data.redis.serializer.JdkSerializationRedisSerializer;
@@ -18,7 +10,15 @@ import org.springframework.util.StringUtils;
 import redis.clients.jedis.JedisPoolConfig;
 import redis.clients.jedis.JedisSentinelPool;
 import redis.clients.jedis.ShardedJedisPool;
+
+import java.io.ByteArrayInputStream;
+import java.io.IOException;
+import java.util.HashSet;
+import java.util.Iterator;
+import java.util.LinkedList;
+import java.util.Properties;
 /**
+ *
  * Created by kong on 2016/1/24.
  */
 public class SimpleRedisRepositoryFactory {
@@ -87,7 +87,7 @@ public class SimpleRedisRepositoryFactory {
         sentinels.add(ip + ":" + port);
         JedisSentinelPool jedisPool = new JedisSentinelPool(maseterName, sentinels, jedisPoolConfig, exprie, password, database);
         RedisManagerRepository redisManagerRepository = new RedisManagerRepository();
-        redisManagerRepository.setJedisPool(jedisPool);
+        redisManagerRepository.setJedisSentinelPool(jedisPool);
         redisManagerRepository.setKeySerializer(new StringRedisSerializer());
         redisManagerRepository.setValueSerializer(new JdkSerializationRedisSerializer());
         return redisManagerRepository;

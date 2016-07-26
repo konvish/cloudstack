@@ -1,20 +1,9 @@
 package com.kong.cloudstack.cache;
 
-/**
- * Created by kong on 2016/1/24.
- */
 import com.kong.cloudstack.cache.IRedisRepository;
-import java.util.Collection;
-import java.util.Date;
-import java.util.Iterator;
-import java.util.LinkedHashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
-import java.util.Map.Entry;
-import java.util.concurrent.TimeUnit;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.redis.connection.convert.Converters;
 import org.springframework.data.redis.connection.jedis.JedisConverters;
 import org.springframework.data.redis.core.TimeoutUtils;
@@ -28,28 +17,38 @@ import org.springframework.util.CollectionUtils;
 import redis.clients.jedis.Jedis;
 import redis.clients.jedis.JedisSentinelPool;
 
+import java.util.*;
+import java.util.concurrent.TimeUnit;
+
+/**
+ * 基于spring集成Jedis template，在applicationContext-redis中配置
+ * Redis集群操作API，实现了RedisAPIs接口
+ * Created by kong on 2016/1/24.
+ */
+
 @Repository("redisManagerRepository")
 public class RedisManagerRepository<K, V> implements IRedisRepository<K, V> {
+
     private Logger logger = LoggerFactory.getLogger(RedisManagerRepository.class);
+
     private RedisSerializer keySerializer = new StringRedisSerializer();
     private RedisSerializer valueSerializer = new JdkSerializationRedisSerializer();
     private RedisSerializer hashKeySerializer = new StringRedisSerializer();
     private RedisSerializer hashValueSerializer = new StringRedisSerializer();
-    private JedisSentinelPool jedisPool;
 
-    public RedisManagerRepository() {
+    @Autowired(required = false)
+    private JedisSentinelPool jedisSentinelPool;
+
+    public JedisSentinelPool getJedisSentinelPool() {
+        return jedisSentinelPool;
     }
 
-    public JedisSentinelPool getJedisPool() {
-        return this.jedisPool;
-    }
-
-    public void setJedisPool(JedisSentinelPool jedisPool) {
-        this.jedisPool = jedisPool;
+    public void setJedisSentinelPool(JedisSentinelPool jedisSentinelPool) {
+        this.jedisSentinelPool = jedisSentinelPool;
     }
 
     public RedisSerializer getKeySerializer() {
-        return this.keySerializer;
+        return keySerializer;
     }
 
     public void setKeySerializer(RedisSerializer keySerializer) {
@@ -57,7 +56,7 @@ public class RedisManagerRepository<K, V> implements IRedisRepository<K, V> {
     }
 
     public RedisSerializer getValueSerializer() {
-        return this.valueSerializer;
+        return valueSerializer;
     }
 
     public void setValueSerializer(RedisSerializer valueSerializer) {
@@ -65,7 +64,7 @@ public class RedisManagerRepository<K, V> implements IRedisRepository<K, V> {
     }
 
     public RedisSerializer getHashKeySerializer() {
-        return this.hashKeySerializer;
+        return hashKeySerializer;
     }
 
     public void setHashKeySerializer(RedisSerializer hashKeySerializer) {
@@ -73,7 +72,7 @@ public class RedisManagerRepository<K, V> implements IRedisRepository<K, V> {
     }
 
     public RedisSerializer getHashValueSerializer() {
-        return this.hashValueSerializer;
+        return hashValueSerializer;
     }
 
     public void setHashValueSerializer(RedisSerializer hashValueSerializer) {
@@ -82,926 +81,813 @@ public class RedisManagerRepository<K, V> implements IRedisRepository<K, V> {
 
     private byte[] rawKey(Object key) {
         Assert.notNull(key, "non null key required");
-        return this.keySerializer == null && key instanceof byte[]?(byte[])((byte[])key):this.keySerializer.serialize(key);
+        if (keySerializer == null && key instanceof byte[]) {
+            return (byte[]) key;
+        }
+        return keySerializer.serialize(key);
     }
 
+    @SuppressWarnings("unchecked")
     <T> List<T> deserializeHashValues(List<byte[]> rawValues) {
-        return this.hashValueSerializer == null?rawValues:SerializationUtils.deserialize(rawValues, this.hashValueSerializer);
+        if (hashValueSerializer == null) {
+            return (List<T>) rawValues;
+        }
+        return SerializationUtils.deserialize(rawValues, hashValueSerializer);
     }
 
+    @SuppressWarnings("unchecked")
     List<V> deserializeValues(List<byte[]> rawValues) {
-        return this.valueSerializer == null?rawValues:SerializationUtils.deserialize(rawValues, this.valueSerializer);
+        if (valueSerializer == null) {
+            return (List<V>) rawValues;
+        }
+        return SerializationUtils.deserialize(rawValues, valueSerializer);
     }
 
     private byte[][] rawKeys(Collection<K> keys) {
-        byte[][] rawKeys = new byte[keys.size()][];
-        int i = 0;
+        final byte[][] rawKeys = new byte[keys.size()][];
 
-        Object key;
-        for(Iterator i$ = keys.iterator(); i$.hasNext(); rawKeys[i++] = this.rawKey(key)) {
-            key = i$.next();
+        int i = 0;
+        for (K key : keys) {
+            rawKeys[i++] = rawKey(key);
         }
 
         return rawKeys;
     }
 
+    @SuppressWarnings("unchecked")
     byte[] rawValue(Object value) {
-        return this.valueSerializer == null && value instanceof byte[]?(byte[])((byte[])value):this.valueSerializer.serialize(value);
+        if (valueSerializer == null && value instanceof byte[]) {
+            return (byte[]) value;
+        }
+        return valueSerializer.serialize(value);
     }
 
     <HK> byte[][] rawHashKeys(HK... hashKeys) {
-        byte[][] rawHashKeys = new byte[hashKeys.length][];
+        final byte[][] rawHashKeys = new byte[hashKeys.length][];
         int i = 0;
-        Object[] arr$ = hashKeys;
-        int len$ = hashKeys.length;
-
-        for(int i$ = 0; i$ < len$; ++i$) {
-            Object hashKey = arr$[i$];
-            rawHashKeys[i++] = this.rawHashKey(hashKey);
+        for (HK hashKey : hashKeys) {
+            rawHashKeys[i++] = rawHashKey(hashKey);
         }
-
         return rawHashKeys;
     }
 
+    @SuppressWarnings("unchecked")
     <HK> byte[] rawHashKey(HK hashKey) {
         Assert.notNull(hashKey, "non null hash key required");
-        return this.hashKeySerializer == null && hashKey instanceof byte[]?(byte[])((byte[])hashKey):this.hashKeySerializer.serialize(hashKey);
+        if (hashKeySerializer == null && hashKey instanceof byte[]) {
+            return (byte[]) hashKey;
+        }
+        return hashKeySerializer.serialize(hashKey);
     }
 
     private V deserializeValue(byte[] value) {
-        return this.valueSerializer == null?value:this.valueSerializer.deserialize(value);
-    }
-
-    <HK, HV> Map<HK, HV> deserializeHashMap(Map<byte[], byte[]> entries) {
-        if(entries == null) {
-            return null;
-        } else {
-            LinkedHashMap map = new LinkedHashMap(entries.size());
-            Iterator i$ = entries.entrySet().iterator();
-
-            while(i$.hasNext()) {
-                Entry entry = (Entry)i$.next();
-                map.put(this.deserializeHashKey((byte[])entry.getKey()), this.deserializeHashValue((byte[])entry.getValue()));
-            }
-
-            return map;
+        if (valueSerializer == null) {
+            return (V) value;
         }
+        return (V) valueSerializer.deserialize(value);
     }
 
+    @SuppressWarnings("unchecked")
+    <HK, HV> Map<HK, HV> deserializeHashMap(Map<byte[], byte[]> entries) {
+        // connection in pipeline/multi mode
+        if (entries == null) {
+            return null;
+        }
+
+        Map<HK, HV> map = new LinkedHashMap<HK, HV>(entries.size());
+
+        for (Map.Entry<byte[], byte[]> entry : entries.entrySet()) {
+            map.put((HK) deserializeHashKey(entry.getKey()), (HV) deserializeHashValue(entry.getValue()));
+        }
+
+        return map;
+    }
+
+    @SuppressWarnings({"unchecked"})
     <HK> HK deserializeHashKey(byte[] value) {
-        return this.hashKeySerializer == null?value:this.hashKeySerializer.deserialize(value);
+        if (hashKeySerializer == null) {
+            return (HK) value;
+        }
+        return (HK) hashKeySerializer.deserialize(value);
     }
 
+    @SuppressWarnings("unchecked")
     <HV> HV deserializeHashValue(byte[] value) {
-        return this.hashValueSerializer == null?value:this.hashValueSerializer.deserialize(value);
+        if (hashValueSerializer == null) {
+            return (HV) value;
+        }
+        return (HV) hashValueSerializer.deserialize(value);
     }
 
+    @SuppressWarnings("unchecked")
     Set<V> deserializeValues(Set<byte[]> rawValues) {
-        return this.valueSerializer == null?rawValues:SerializationUtils.deserialize(rawValues, this.valueSerializer);
+        if (valueSerializer == null) {
+            return (Set<V>) rawValues;
+        }
+        return SerializationUtils.deserialize(rawValues, valueSerializer);
     }
 
     byte[][] rawValues(Object... values) {
-        byte[][] rawValues = new byte[values.length][];
+        final byte[][] rawValues = new byte[values.length][];
         int i = 0;
-        Object[] arr$ = values;
-        int len$ = values.length;
-
-        for(int i$ = 0; i$ < len$; ++i$) {
-            Object value = arr$[i$];
-            rawValues[i++] = this.rawValue(value);
+        for (Object value : values) {
+            rawValues[i++] = rawValue(value);
         }
-
         return rawValues;
     }
 
+    @SuppressWarnings("unchecked")
     <HV> byte[] rawHashValue(HV value) {
-        return this.hashValueSerializer == null & value instanceof byte[]?(byte[])((byte[])value):this.hashValueSerializer.serialize(value);
+        if (hashValueSerializer == null & value instanceof byte[]) {
+            return (byte[]) value;
+        }
+        return hashValueSerializer.serialize(value);
     }
 
+    @SuppressWarnings("unchecked")
     <T> Set<T> deserializeHashKeys(Set<byte[]> rawKeys) {
-        return this.hashKeySerializer == null?rawKeys:SerializationUtils.deserialize(rawKeys, this.hashKeySerializer);
+        if (hashKeySerializer == null) {
+            return (Set<T>) rawKeys;
+        }
+        return SerializationUtils.deserialize(rawKeys, hashKeySerializer);
     }
+//    private BoundValueOperations<K,V> getBoundValueOps(K key) {
+//        Jedis jedis = jedisPool.getResource();
+//        jedis.
+//        return redisTemplate.boundValueOps(key);
+//    }
+//
+//    private BoundZSetOperations<K,V> getBoundZSetOps(K key) {
+//        return redisTemplate.boundZSetOps(key);
+//    }
+//
+//    private BoundSetOperations<K,V> getBoundSetOps(K key) {
+//        return redisTemplate.boundSetOps(key);
+//    }
+//
+//    private BoundListOperations<K,V> getBoundListOps(K key) {
+//        return redisTemplate.boundListOps(key);
+//    }
+//
+//    private <HK, HV> BoundHashOperations<K, HK, HV> getBoundHashOps(K key) {
+//        return redisTemplate.boundHashOps(key);
+//    }
 
-    public void del(K key) {
-        byte[] rawKey = this.rawKey(key);
-        Jedis jedis = this.jedisPool.getResource();
+    /********************************************/
+    /********************************************/
+    /********************************************/
+    /********************************************/
 
+    // Key
+    public void del(final K key) {
+        final byte[] rawKey = rawKey(key);
+        Jedis jedis = jedisSentinelPool.getResource();
         try {
             jedis.del(rawKey);
-        } catch (Exception var8) {
-            this.returnBrokenResource(jedis, var8);
+        } catch (Exception e) {
+            this.returnBrokenResource(jedis, e);
         } finally {
             this.returnResource(jedis);
         }
-
     }
 
-    public void del(Collection<K> keys) {
-        Jedis jedis = this.jedisPool.getResource();
+    public void del(final Collection<K> keys) {
 
+        Jedis jedis = jedisSentinelPool.getResource();
         try {
-            if(CollectionUtils.isEmpty(keys)) {
+            if (CollectionUtils.isEmpty(keys)) {
                 return;
             }
 
-            byte[][] e = this.rawKeys(keys);
-            jedis.del(e);
-        } catch (Exception var7) {
-            this.returnBrokenResource(jedis, var7);
+            final byte[][] rawKeys = rawKeys(keys);
+
+            jedis.del(rawKeys);
+        } catch (Exception e) {
+            this.returnBrokenResource(jedis, e);
+        } finally {
+            this.returnResource(jedis);
+        }
+    }
+
+    public Boolean exists(final K key) {
+        final byte[] rawKey = rawKey(key);
+        Jedis jedis = jedisSentinelPool.getResource();
+        try {
+            return jedis.exists(rawKey);
+        } catch (Exception e) {
+            this.returnBrokenResource(jedis, e);
+            return true;
         } finally {
             this.returnResource(jedis);
         }
 
     }
 
-    public Boolean exists(K key) {
-        byte[] rawKey = this.rawKey(key);
-        Jedis jedis = this.jedisPool.getResource();
+    public Boolean expire(final K key, final long timeout, final TimeUnit unit) {
 
-        Boolean var5;
+        final byte[] rawKey = rawKey(key);
+        final long rawTimeout = TimeoutUtils.toMillis(timeout, unit);
+
+        Jedis jedis = jedisSentinelPool.getResource();
         try {
-            Boolean e = jedis.exists(rawKey);
-            return e;
-        } catch (Exception var9) {
-            this.returnBrokenResource(jedis, var9);
-            var5 = Boolean.valueOf(true);
-        } finally {
-            this.returnResource(jedis);
-        }
-
-        return var5;
-    }
-
-    public Boolean expire(K key, long timeout, TimeUnit unit) {
-        byte[] rawKey = this.rawKey(key);
-        long rawTimeout = TimeoutUtils.toMillis(timeout, unit);
-        Jedis jedis = this.jedisPool.getResource();
-
-        Boolean var10;
-        try {
-            Boolean e;
-            if(rawTimeout <= 2147483647L) {
-                e = JedisConverters.toBoolean(jedis.pexpire(rawKey, rawTimeout));
-                return e;
+            if (rawTimeout > Integer.MAX_VALUE) {
+                return JedisConverters.toBoolean(jedis.pexpireAt(rawKey, time(jedis) + rawTimeout));
             }
-
-            e = JedisConverters.toBoolean(jedis.pexpireAt(rawKey, this.time(jedis).longValue() + rawTimeout));
-            return e;
-        } catch (Exception var14) {
-            this.logger.error("", var14);
-            var10 = JedisConverters.toBoolean(jedis.expire(rawKey, (int)TimeoutUtils.toSeconds(timeout, unit)));
+            return JedisConverters.toBoolean(jedis.pexpire(rawKey, rawTimeout));
+        } catch (Exception e) {
+            logger.error("", e);
+            // Driver may not support pExpire or we may be running on Redis 2.4
+            return JedisConverters.toBoolean(jedis.expire(rawKey, (int) TimeoutUtils.toSeconds(timeout, unit)));
         } finally {
             this.returnResource(jedis);
         }
-
-        return var10;
     }
 
     public Long time(Jedis jedis) {
-        List serverTimeInformation = jedis.time();
+
+        List<String> serverTimeInformation = jedis.time();
+
         Assert.notEmpty(serverTimeInformation, "Received invalid result from server. Expected 2 items in collection.");
-        Assert.isTrue(serverTimeInformation.size() == 2, "Received invalid nr of arguments from redis server. Expected 2 received " + serverTimeInformation.size());
-        return Converters.toTimeMillis((String)serverTimeInformation.get(0), (String)serverTimeInformation.get(1));
+        Assert.isTrue(serverTimeInformation.size() == 2,
+                "Received invalid nr of arguments from redis server. Expected 2 received " + serverTimeInformation.size());
+
+        return Converters.toTimeMillis(serverTimeInformation.get(0), serverTimeInformation.get(1));
     }
 
-    public void expireAt(K key, Date date) {
-        byte[] rawKey = this.rawKey(key);
-        Jedis jedis = this.jedisPool.getResource();
-
+    public void expireAt(final K key, Date date) {
+        final byte[] rawKey = rawKey(key);
+        Jedis jedis = jedisSentinelPool.getResource();
         try {
             jedis.pexpireAt(rawKey, date.getTime());
-        } catch (Exception var9) {
-            jedis.expireAt(rawKey, date.getTime() / 1000L);
-            this.returnBrokenResource(jedis, var9);
+        } catch (Exception e) {
+            jedis.expireAt(rawKey, date.getTime() / 1000);
+            this.returnBrokenResource(jedis, e);
         } finally {
             this.returnResource(jedis);
         }
-
     }
 
-    public Set<K> keys(K pattern) {
-        byte[] rawKey = this.rawKey(pattern);
-        Jedis jedis = this.jedisPool.getResource();
-
-        Set var5;
+    public Set<K> keys(final K pattern) {
+        final byte[] rawKey = rawKey(pattern);
+        Jedis jedis = jedisSentinelPool.getResource();
         try {
-            Set e = jedis.keys(rawKey);
-            var5 = this.keySerializer != null?SerializationUtils.deserialize(e, this.keySerializer):e;
-            return var5;
-        } catch (Exception var9) {
-            this.returnBrokenResource(jedis, var9);
-            var5 = null;
+            Set<byte[]> rawKeys = jedis.keys(rawKey);
+            Set<K> k = (Set<K>) rawKeys;
+            return keySerializer != null ? SerializationUtils.deserialize(rawKeys, keySerializer) : k;
+        } catch (Exception e) {
+            this.returnBrokenResource(jedis, e);
+            return null;
         } finally {
             this.returnResource(jedis);
         }
-
-        return var5;
     }
 
-    public String type(K key) {
-        byte[] rawKey = this.rawKey(key);
-        Jedis jedis = this.jedisPool.getResource();
-
-        Object var5;
+    public String type(final K key) {
+        final byte[] rawKey = rawKey(key);
+        Jedis jedis = jedisSentinelPool.getResource();
         try {
-            String e = jedis.type(rawKey);
-            return e;
-        } catch (Exception var9) {
-            this.returnBrokenResource(jedis, var9);
-            var5 = null;
+            return jedis.type(rawKey);
+        } catch (Exception e) {
+            this.returnBrokenResource(jedis, e);
+            return null;
         } finally {
             this.returnResource(jedis);
         }
-
-        return (String)var5;
     }
 
-    public V get(K key) {
-        byte[] rawKey = this.rawKey(key);
-        Jedis jedis = this.jedisPool.getResource();
-
-        Object var5;
+    public V get(final K key) {
+        final byte[] rawKey = rawKey(key);
+        Jedis jedis = jedisSentinelPool.getResource();
         try {
-            Object e = this.deserializeValue(jedis.get(rawKey));
-            return e;
-        } catch (Exception var9) {
-            this.returnBrokenResource(jedis, var9);
-            var5 = null;
+            return deserializeValue(jedis.get(rawKey));
+        } catch (Exception e) {
+            this.returnBrokenResource(jedis, e);
+            return null;
         } finally {
             this.returnResource(jedis);
         }
-
-        return var5;
     }
 
-    public V getSet(K key, V value) {
-        byte[] rawKey = this.rawKey(key);
-        byte[] rawValue = this.rawValue(value);
-        Jedis jedis = this.jedisPool.getResource();
-
-        Object var7;
+    public V getSet(final K key, final V value) {
+        final byte[] rawKey = rawKey(key);
+        final byte[] rawValue = rawValue(value);
+        Jedis jedis = jedisSentinelPool.getResource();
         try {
-            Object e = this.deserializeValue(jedis.getSet(rawKey, rawValue));
-            return e;
-        } catch (Exception var11) {
-            this.returnBrokenResource(jedis, var11);
-            var7 = null;
+            return deserializeValue(jedis.getSet(rawKey, rawValue));
+        } catch (Exception e) {
+            this.returnBrokenResource(jedis, e);
+            return null;
         } finally {
             this.returnResource(jedis);
         }
-
-        return var7;
     }
 
-    public Long incr(K key, long delta) {
-        byte[] rawKey = this.rawKey(key);
-        Jedis jedis = this.jedisPool.getResource();
-
-        Object var7;
+    public Long incr(final K key, final long delta) {
+        final byte[] rawKey = rawKey(key);
+        Jedis jedis = jedisSentinelPool.getResource();
         try {
-            Long e = jedis.incrBy(rawKey, delta);
-            return e;
-        } catch (Exception var11) {
-            this.returnBrokenResource(jedis, var11);
-            var7 = null;
+            return jedis.incrBy(rawKey, delta);
+        } catch (Exception e) {
+            this.returnBrokenResource(jedis, e);
+            return null;
         } finally {
             this.returnResource(jedis);
         }
-
-        return (Long)var7;
     }
 
-    public void set(K key, V value) {
-        byte[] rawKey = this.rawKey(key);
-        byte[] rawValue = this.rawValue(value);
-        Jedis jedis = this.jedisPool.getResource();
-
+    public void set(final K key, final V value) {
+        final byte[] rawKey = rawKey(key);
+        final byte[] rawValue = rawValue(value);
+        Jedis jedis = jedisSentinelPool.getResource();
         try {
             jedis.set(rawKey, rawValue);
-        } catch (Exception var10) {
-            this.returnBrokenResource(jedis, var10);
+        } catch (Exception e) {
+            this.returnBrokenResource(jedis, e);
         } finally {
             this.returnResource(jedis);
         }
-
     }
 
-    public void set(K key, V value, long timeout, TimeUnit unit) {
-        byte[] rawKey = this.rawKey(key);
-        byte[] rawValue = this.rawValue(value);
-        Jedis jedis = this.jedisPool.getResource();
-
+    public void set(final K key, final V value, final long timeout, final TimeUnit unit) {
+        final byte[] rawKey = rawKey(key);
+        final byte[] rawValue = rawValue(value);
+        Jedis jedis = jedisSentinelPool.getResource();
         try {
-            jedis.setex(rawKey, (int)TimeoutUtils.toSeconds(timeout, unit), rawValue);
-        } catch (Exception var13) {
-            jedis.psetex(rawKey, (int)timeout, rawValue);
-            this.returnBrokenResource(jedis, var13);
+            jedis.setex(rawKey, (int) TimeoutUtils.toSeconds(timeout, unit), rawValue);
+        } catch (Exception e) {
+            jedis.psetex(rawKey, (int) timeout, rawValue);
+            this.returnBrokenResource(jedis, e);
         } finally {
             this.returnResource(jedis);
         }
-
     }
 
-    public void hDel(K key, Object... hKeys) {
-        byte[] rawKey = this.rawKey(key);
-        byte[][] rawHashKeys = this.rawHashKeys(hKeys);
-        Jedis jedis = this.jedisPool.getResource();
-
+    // Hash
+    public void hDel(final K key, final Object... hKeys) {
+        final byte[] rawKey = rawKey(key);
+        final byte[][] rawHashKeys = rawHashKeys(hKeys);
+        Jedis jedis = jedisSentinelPool.getResource();
         try {
             jedis.hdel(rawKey, rawHashKeys);
-        } catch (Exception var10) {
-            this.returnBrokenResource(jedis, var10);
+        } catch (Exception e) {
+            this.returnBrokenResource(jedis, e);
         } finally {
             this.returnResource(jedis);
         }
-
     }
 
-    public Boolean hExists(K key, K hKeys) {
-        byte[] rawKey = this.rawKey(key);
-        byte[] rawHashKey = this.rawHashKey(hKeys);
-        Jedis jedis = this.jedisPool.getResource();
-
-        Object var7;
+    public Boolean hExists(final K key, final K hKeys) {
+        final byte[] rawKey = rawKey(key);
+        final byte[] rawHashKey = rawHashKey(hKeys);
+        Jedis jedis = jedisSentinelPool.getResource();
         try {
-            Boolean e = jedis.hexists(rawKey, rawHashKey);
-            return e;
-        } catch (Exception var11) {
-            this.returnBrokenResource(jedis, var11);
-            var7 = null;
+            return jedis.hexists(rawKey, rawHashKey);
+        } catch (Exception e) {
+            this.returnBrokenResource(jedis, e);
+            return null;
         } finally {
             this.returnResource(jedis);
         }
-
-        return (Boolean)var7;
     }
 
-    public Map<K, V> hGet(K key) {
-        Jedis jedis = this.jedisPool.getResource();
-        byte[] rawKey = this.rawKey(key);
-
-        Map var5;
+    public Map<K, V> hGet(final K key) {
+        Jedis jedis = jedisSentinelPool.getResource();
+        final byte[] rawKey = rawKey(key);
         try {
-            Map e = jedis.hgetAll(rawKey);
-            var5 = this.deserializeHashMap(e);
-            return var5;
-        } catch (Exception var9) {
-            this.returnBrokenResource(jedis, var9);
-            var5 = null;
+            Map<byte[], byte[]> entries = jedis.hgetAll(rawKey);
+            return deserializeHashMap(entries);
+        } catch (Exception e) {
+            this.returnBrokenResource(jedis, e);
+            return null;
         } finally {
             this.returnResource(jedis);
         }
-
-        return var5;
     }
 
-    public V hGet(K key, K hKey) {
-        Jedis jedis = this.jedisPool.getResource();
-        byte[] rawKey = this.rawKey(key);
-        byte[] rawHashKey = this.rawHashKey(hKey);
-
-        Object var7;
+    public V hGet(final K key, final K hKey) {
+        Jedis jedis = jedisSentinelPool.getResource();
+        final byte[] rawKey = rawKey(key);
+        final byte[] rawHashKey = rawHashKey(hKey);
         try {
-            byte[] e = jedis.hget(rawKey, rawHashKey);
-            var7 = this.deserializeHashValue(e);
-            return var7;
-        } catch (Exception var11) {
-            this.returnBrokenResource(jedis, var11);
-            var7 = null;
+            byte[] rawHashValue = jedis.hget(rawKey, rawHashKey);
+            return deserializeHashValue(rawHashValue);
+        } catch (Exception e) {
+            this.returnBrokenResource(jedis, e);
+            return null;
         } finally {
             this.returnResource(jedis);
         }
-
-        return var7;
     }
 
-    public Set<K> hKeys(K key) {
-        Jedis jedis = this.jedisPool.getResource();
-        byte[] rawKey = this.rawKey(key);
-
-        Set var5;
+    public Set<K> hKeys(final K key) {
+        Jedis jedis = jedisSentinelPool.getResource();
+        final byte[] rawKey = rawKey(key);
         try {
-            Set e = jedis.hkeys(rawKey);
-            var5 = this.deserializeHashKeys(e);
-            return var5;
-        } catch (Exception var9) {
-            this.returnBrokenResource(jedis, var9);
-            var5 = null;
+            Set<byte[]> rawValues = jedis.hkeys(rawKey);
+            return deserializeHashKeys(rawValues);
+        } catch (Exception e) {
+            this.returnBrokenResource(jedis, e);
+            return null;
         } finally {
             this.returnResource(jedis);
         }
-
-        return var5;
     }
 
-    public Long hLen(K key) {
-        Jedis jedis = this.jedisPool.getResource();
-        byte[] rawKey = this.rawKey(key);
-
-        Object var5;
+    public Long hLen(final K key) {
+        Jedis jedis = jedisSentinelPool.getResource();
+        final byte[] rawKey = rawKey(key);
         try {
-            Long e = jedis.hlen(rawKey);
-            return e;
-        } catch (Exception var9) {
-            this.returnBrokenResource(jedis, var9);
-            var5 = null;
+            return jedis.hlen(rawKey);
+        } catch (Exception e) {
+            this.returnBrokenResource(jedis, e);
+            return null;
         } finally {
             this.returnResource(jedis);
         }
-
-        return (Long)var5;
     }
 
-    public void hSet(K key, K hk, V hv) {
-        Jedis jedis = this.jedisPool.getResource();
-        byte[] rawKey = this.rawKey(key);
-        byte[] rawHashKey = this.rawHashKey(hk);
-        byte[] rawHashValue = this.rawHashValue(hv);
-
+    public void hSet(final K key, final K hk, final V hv) {
+        Jedis jedis = jedisSentinelPool.getResource();
+        final byte[] rawKey = rawKey(key);
+        final byte[] rawHashKey = rawHashKey(hk);
+        final byte[] rawHashValue = rawHashValue(hv);
         try {
             jedis.hset(rawKey, rawHashKey, rawHashValue);
-        } catch (Exception var12) {
-            this.returnBrokenResource(jedis, var12);
+        } catch (Exception e) {
+            this.returnBrokenResource(jedis, e);
         } finally {
             this.returnResource(jedis);
         }
-
     }
 
-    public void hSet(K key, Map<K, V> map) {
-        if(!map.isEmpty()) {
-            Jedis jedis = this.jedisPool.getResource();
-            byte[] rawKey = this.rawKey(key);
+    public void hSet(final K key, final Map<K, V> map) {
+        if (map.isEmpty()) {
+            return;
+        }
+        Jedis jedis = jedisSentinelPool.getResource();
+        final byte[] rawKey = rawKey(key);
+        try {
+            final Map<byte[], byte[]> hashes = new LinkedHashMap<byte[], byte[]>(map.size());
 
-            try {
-                LinkedHashMap e = new LinkedHashMap(map.size());
-                Iterator i$ = map.entrySet().iterator();
-
-                while(i$.hasNext()) {
-                    Entry entry = (Entry)i$.next();
-                    e.put(this.rawHashKey(entry.getKey()), this.rawHashValue(entry.getValue()));
-                }
-
-                jedis.hmset(rawKey, e);
-            } catch (Exception var11) {
-                this.returnBrokenResource(jedis, var11);
-            } finally {
-                this.returnResource(jedis);
+            for (Map.Entry<? extends K, ? extends V> entry : map.entrySet()) {
+                hashes.put(rawHashKey(entry.getKey()), rawHashValue(entry.getValue()));
             }
-
-        }
-    }
-
-    public List<V> hVals(K key) {
-        Jedis jedis = this.jedisPool.getResource();
-        byte[] rawKey = this.rawKey(key);
-
-        List var5;
-        try {
-            List e = jedis.hvals(rawKey);
-            var5 = this.deserializeHashValues(e);
-            return var5;
-        } catch (Exception var9) {
-            this.returnBrokenResource(jedis, var9);
-            var5 = null;
+            jedis.hmset(rawKey, hashes);
+        } catch (Exception e) {
+            this.returnBrokenResource(jedis, e);
         } finally {
             this.returnResource(jedis);
         }
-
-        return var5;
     }
 
-    public V lIndex(K key, long index) {
-        Jedis jedis = this.jedisPool.getResource();
-        byte[] rawKey = this.rawKey(key);
-
-        Object var7;
+    public List<V> hVals(final K key) {
+        Jedis jedis = jedisSentinelPool.getResource();
+        final byte[] rawKey = rawKey(key);
         try {
-            byte[] e = jedis.lindex(rawKey, index);
-            var7 = this.deserializeValue(e);
-            return var7;
-        } catch (Exception var11) {
-            this.returnBrokenResource(jedis, var11);
-            var7 = null;
+            List<byte[]> rawValues = jedis.hvals(rawKey);
+            return deserializeHashValues(rawValues);
+        } catch (Exception e) {
+            this.returnBrokenResource(jedis, e);
+            return null;
         } finally {
             this.returnResource(jedis);
         }
-
-        return var7;
     }
 
-    public void lInsert(K key, long index, V value) {
-        Jedis jedis = this.jedisPool.getResource();
-        byte[] rawKey = this.rawKey(key);
-        byte[] rawValue = this.rawValue(value);
+    // List
 
+    public V lIndex(final K key, final long index) {
+        Jedis jedis = jedisSentinelPool.getResource();
+        final byte[] rawKey = rawKey(key);
+        try {
+            byte[] result = jedis.lindex(rawKey, index);
+            return deserializeValue(result);
+        } catch (Exception e) {
+            this.returnBrokenResource(jedis, e);
+            return null;
+        } finally {
+            this.returnResource(jedis);
+        }
+    }
+
+    public void lInsert(final K key, final long index, V value) {
+        Jedis jedis = jedisSentinelPool.getResource();
+        final byte[] rawKey = rawKey(key);
+        final byte[] rawValue = rawValue(value);
         try {
             jedis.lset(rawKey, index, rawValue);
-        } catch (Exception var12) {
-            this.returnBrokenResource(jedis, var12);
+        } catch (Exception e) {
+            this.returnBrokenResource(jedis, e);
         } finally {
             this.returnResource(jedis);
         }
-
     }
 
-    public Long lLen(K key) {
-        Jedis jedis = this.jedisPool.getResource();
-        byte[] rawKey = this.rawKey(key);
-
-        Object var5;
+    public Long lLen(final K key) {
+        Jedis jedis = jedisSentinelPool.getResource();
+        final byte[] rawKey = rawKey(key);
         try {
-            Long e = jedis.llen(rawKey);
-            return e;
-        } catch (Exception var9) {
-            this.returnBrokenResource(jedis, var9);
-            var5 = null;
+            return jedis.llen(rawKey);
+        } catch (Exception e) {
+            this.returnBrokenResource(jedis, e);
+            return null;
         } finally {
             this.returnResource(jedis);
         }
-
-        return (Long)var5;
     }
 
-    public V lPop(K key) {
-        Jedis jedis = this.jedisPool.getResource();
-        byte[] rawKey = this.rawKey(key);
-
-        Object var5;
+    public V lPop(final K key) {
+        Jedis jedis = jedisSentinelPool.getResource();
+        final byte[] rawKey = rawKey(key);
         try {
-            byte[] e = jedis.lpop(rawKey);
-            var5 = this.deserializeValue(e);
-            return var5;
-        } catch (Exception var9) {
-            this.returnBrokenResource(jedis, var9);
-            var5 = null;
+            byte[] result = jedis.lpop(rawKey);
+            return deserializeValue(result);
+        } catch (Exception e) {
+            this.returnBrokenResource(jedis, e);
+            return null;
         } finally {
             this.returnResource(jedis);
         }
-
-        return var5;
     }
 
-    public V lPop(K key, long timeout, TimeUnit unit) {
-        Jedis jedis = this.jedisPool.getResource();
-        byte[] rawKey = this.rawKey(key);
-        int tm = (int)TimeoutUtils.toSeconds(timeout, unit);
-
-        Object result;
+    public V lPop(final K key, long timeout, TimeUnit unit) {
+        Jedis jedis = jedisSentinelPool.getResource();
+        final byte[] rawKey = rawKey(key);
+        final int tm = (int) TimeoutUtils.toSeconds(timeout, unit);
         try {
-            List e = jedis.blpop(tm, new byte[][]{rawKey});
-            byte[] result1 = CollectionUtils.isEmpty(e)?null:(byte[])e.get(1);
-            Object var10 = this.deserializeValue(result1);
-            return var10;
-        } catch (Exception var14) {
-            this.returnBrokenResource(jedis, var14);
-            result = null;
+            List<byte[]> lPop = jedis.blpop(tm, rawKey);
+            byte[] result = (CollectionUtils.isEmpty(lPop) ? null : lPop.get(1));
+            return deserializeValue(result);
+        } catch (Exception e) {
+            this.returnBrokenResource(jedis, e);
+            return null;
         } finally {
             this.returnResource(jedis);
         }
-
-        return result;
     }
 
-    public Long lPush(K key, V value) {
-        Jedis jedis = this.jedisPool.getResource();
-        byte[] rawKey = this.rawKey(key);
-        byte[] rawValue = this.rawValue(value);
-
-        Object var7;
+    public Long lPush(final K key, final V value) {
+        Jedis jedis = jedisSentinelPool.getResource();
+        final byte[] rawKey = rawKey(key);
+        final byte[] rawValue = rawValue(value);
         try {
-            Long e = jedis.lpush(rawKey, new byte[][]{rawValue});
-            return e;
-        } catch (Exception var11) {
-            this.returnBrokenResource(jedis, var11);
-            var7 = null;
+            return jedis.lpush(rawKey, rawValue);
+        } catch (Exception e) {
+            this.returnBrokenResource(jedis, e);
+            return null;
         } finally {
             this.returnResource(jedis);
         }
-
-        return (Long)var7;
     }
 
-    public List<V> lRange(K key, long start, long end) {
-        Jedis jedis = this.jedisPool.getResource();
-        byte[] rawKey = this.rawKey(key);
-
-        List var9;
+    public List<V> lRange(final K key, final long start, final long end) {
+        Jedis jedis = jedisSentinelPool.getResource();
+        final byte[] rawKey = rawKey(key);
         try {
-            List e = jedis.lrange(rawKey, start, end);
-            var9 = this.deserializeValues(e);
-            return var9;
-        } catch (Exception var13) {
-            this.returnBrokenResource(jedis, var13);
-            var9 = null;
+            List<byte[]> rawValues = jedis.lrange(rawKey, start, end);
+            return deserializeValues(rawValues);
+        } catch (Exception e) {
+            this.returnBrokenResource(jedis, e);
+            return null;
         } finally {
             this.returnResource(jedis);
         }
-
-        return var9;
     }
 
-    public Long lRem(K key, long index, V value) {
-        Jedis jedis = this.jedisPool.getResource();
-        byte[] rawKey = this.rawKey(key);
-        byte[] rawValue = this.rawValue(value);
-
-        Object var9;
+    public Long lRem(final K key, final long index, final V value) {
+        Jedis jedis = jedisSentinelPool.getResource();
+        final byte[] rawKey = rawKey(key);
+        final byte[] rawValue = rawValue(value);
         try {
-            Long e = jedis.lrem(rawKey, index, rawValue);
-            return e;
-        } catch (Exception var13) {
-            this.returnBrokenResource(jedis, var13);
-            var9 = null;
+            return jedis.lrem(rawKey, index, rawValue);
+        } catch (Exception e) {
+            this.returnBrokenResource(jedis, e);
+            return null;
         } finally {
             this.returnResource(jedis);
         }
-
-        return (Long)var9;
     }
 
-    public void lSet(K key, long index, V value) {
-        Jedis jedis = this.jedisPool.getResource();
-        byte[] rawKey = this.rawKey(key);
-        byte[] rawValue = this.rawValue(value);
-
+    public void lSet(final K key, final long index, final V value) {
+        Jedis jedis = jedisSentinelPool.getResource();
+        final byte[] rawKey = rawKey(key);
+        final byte[] rawValue = rawValue(value);
         try {
             jedis.lset(rawKey, index, rawValue);
-        } catch (Exception var12) {
-            this.returnBrokenResource(jedis, var12);
+        } catch (Exception e) {
+            this.returnBrokenResource(jedis, e);
         } finally {
             this.returnResource(jedis);
         }
-
     }
 
-    public void ltrim(K key, long start, long end) {
-        Jedis jedis = this.jedisPool.getResource();
-        byte[] rawKey = this.rawKey(key);
-
+    public void ltrim(final K key, final long start, final long end) {
+        Jedis jedis = jedisSentinelPool.getResource();
+        final byte[] rawKey = rawKey(key);
         try {
             jedis.ltrim(rawKey, start, end);
-        } catch (Exception var12) {
-            this.returnBrokenResource(jedis, var12);
+        } catch (Exception e) {
+            this.returnBrokenResource(jedis, e);
         } finally {
             this.returnResource(jedis);
         }
-
     }
 
-    public Long rPush(K key, V value) {
-        Jedis jedis = this.jedisPool.getResource();
-        byte[] rawKey = this.rawKey(key);
-        byte[] rawValue = this.rawValue(value);
-
-        Object var7;
+    public Long rPush(final K key, final V value) {
+        Jedis jedis = jedisSentinelPool.getResource();
+        final byte[] rawKey = rawKey(key);
+        final byte[] rawValue = rawValue(value);
         try {
-            Long e = jedis.rpush(rawKey, new byte[][]{rawValue});
-            return e;
-        } catch (Exception var11) {
-            this.returnBrokenResource(jedis, var11);
-            var7 = null;
+            return jedis.rpush(rawKey, rawValue);
+        } catch (Exception e) {
+            this.returnBrokenResource(jedis, e);
+            return null;
         } finally {
             this.returnResource(jedis);
         }
-
-        return (Long)var7;
     }
 
-    public V rPop(K key) {
-        Jedis jedis = this.jedisPool.getResource();
-        byte[] rawKey = this.rawKey(key);
-
-        Object var5;
+    public V rPop(final K key) {
+        Jedis jedis = jedisSentinelPool.getResource();
+        final byte[] rawKey = rawKey(key);
         try {
-            byte[] e = jedis.rpop(rawKey);
-            var5 = this.deserializeValue(e);
-            return var5;
-        } catch (Exception var9) {
-            this.returnBrokenResource(jedis, var9);
-            var5 = null;
+            byte[] result = jedis.rpop(rawKey);
+            return deserializeValue(result);
+        } catch (Exception e) {
+            this.returnBrokenResource(jedis, e);
+            return null;
         } finally {
             this.returnResource(jedis);
         }
-
-        return var5;
     }
 
-    public Long sAdd(K key, V value) {
-        Jedis jedis = this.jedisPool.getResource();
-        byte[] rawKey = this.rawKey(key);
-        byte[][] rawValues = this.rawValues(new Object[]{value});
+    // Set
 
-        Object var7;
+    public Long sAdd(final K key, final V value) {
+        Jedis jedis = jedisSentinelPool.getResource();
+        final byte[] rawKey = rawKey(key);
+        final byte[][] rawValues = rawValues(value);
         try {
-            Long e = jedis.sadd(rawKey, rawValues);
-            return e;
-        } catch (Exception var11) {
-            this.returnBrokenResource(jedis, var11);
-            var7 = null;
+            return jedis.sadd(rawKey, rawValues);
+        } catch (Exception e) {
+            this.returnBrokenResource(jedis, e);
+            return null;
         } finally {
             this.returnResource(jedis);
         }
-
-        return (Long)var7;
     }
 
-    public Set<V> sDiff(K key) {
-        Jedis jedis = this.jedisPool.getResource();
-        byte[] rawKey = this.rawKey(key);
-
-        Set var5;
+    public Set<V> sDiff(final K key) {
+        Jedis jedis = jedisSentinelPool.getResource();
+        final byte[] rawKey = rawKey(key);
         try {
-            Set e = jedis.sdiff(new byte[][]{rawKey});
-            var5 = this.deserializeValues(e);
-            return var5;
-        } catch (Exception var9) {
-            this.returnBrokenResource(jedis, var9);
-            var5 = null;
+            Set<byte[]> rawValues = jedis.sdiff(rawKey);
+            return deserializeValues(rawValues);
+        } catch (Exception e) {
+            this.returnBrokenResource(jedis, e);
+            return null;
         } finally {
             this.returnResource(jedis);
         }
-
-        return var5;
     }
 
-    public Set<V> sMembers(K key) {
-        Jedis jedis = this.jedisPool.getResource();
-        byte[] rawKey = this.rawKey(key);
-
-        Set var5;
+    public Set<V> sMembers(final K key) {
+        Jedis jedis = jedisSentinelPool.getResource();
+        final byte[] rawKey = rawKey(key);
         try {
-            Set e = jedis.smembers(rawKey);
-            var5 = this.deserializeValues(e);
-            return var5;
-        } catch (Exception var9) {
-            this.returnBrokenResource(jedis, var9);
-            var5 = null;
+            Set<byte[]> rawValues = jedis.smembers(rawKey);
+            return deserializeValues(rawValues);
+        } catch (Exception e) {
+            this.returnBrokenResource(jedis, e);
+            return null;
         } finally {
             this.returnResource(jedis);
         }
-
-        return var5;
     }
 
-    public Boolean sIsMember(K key, V value) {
-        Jedis jedis = this.jedisPool.getResource();
-        byte[] rawKey = this.rawKey(key);
-        byte[] rawValue = this.rawValue(value);
-
-        Object var7;
+    public Boolean sIsMember(final K key, final V value) {
+        Jedis jedis = jedisSentinelPool.getResource();
+        final byte[] rawKey = rawKey(key);
+        final byte[] rawValue = rawValue(value);
         try {
-            Boolean e = jedis.sismember(rawKey, rawValue);
-            return e;
-        } catch (Exception var11) {
-            this.returnBrokenResource(jedis, var11);
-            var7 = null;
+            return jedis.sismember(rawKey, rawValue);
+        } catch (Exception e) {
+            this.returnBrokenResource(jedis, e);
+            return null;
         } finally {
             this.returnResource(jedis);
         }
-
-        return (Boolean)var7;
     }
 
-    public V sPop(K key) {
-        Jedis jedis = this.jedisPool.getResource();
-        byte[] rawKey = this.rawKey(key);
-
-        Object var5;
+    public V sPop(final K key) {
+        Jedis jedis = jedisSentinelPool.getResource();
+        final byte[] rawKey = rawKey(key);
         try {
-            byte[] e = jedis.spop(rawKey);
-            var5 = this.deserializeValue(e);
-            return var5;
-        } catch (Exception var9) {
-            this.returnBrokenResource(jedis, var9);
-            var5 = null;
+            byte[] result = jedis.spop(rawKey);
+            return deserializeValue(result);
+        } catch (Exception e) {
+            this.returnBrokenResource(jedis, e);
+            return null;
         } finally {
             this.returnResource(jedis);
         }
-
-        return var5;
     }
 
-    public Long sRem(K key, V value) {
-        Jedis jedis = this.jedisPool.getResource();
-        byte[] rawKey = this.rawKey(key);
-        byte[][] rawValues = this.rawValues(new Object[]{value});
-
-        Object var7;
+    public Long sRem(final K key, final V value) {
+        Jedis jedis = jedisSentinelPool.getResource();
+        final byte[] rawKey = rawKey(key);
+        final byte[][] rawValues = rawValues(value);
         try {
-            Long e = jedis.srem(rawKey, rawValues);
-            return e;
-        } catch (Exception var11) {
-            this.returnBrokenResource(jedis, var11);
-            var7 = null;
+            return jedis.srem(rawKey, rawValues);
+        } catch (Exception e) {
+            this.returnBrokenResource(jedis, e);
+            return null;
         } finally {
             this.returnResource(jedis);
         }
-
-        return (Long)var7;
     }
 
     public Long sCard(K key) {
-        Jedis jedis = this.jedisPool.getResource();
-        byte[] rawKey = this.rawKey(key);
-
-        Object var5;
+        Jedis jedis = jedisSentinelPool.getResource();
+        final byte[] rawKey = rawKey(key);
         try {
-            Long e = jedis.scard(rawKey);
-            return e;
-        } catch (Exception var9) {
-            this.returnBrokenResource(jedis, var9);
-            var5 = null;
+            return jedis.scard(rawKey);
+        } catch (Exception e) {
+            this.returnBrokenResource(jedis, e);
+            return null;
         } finally {
             this.returnResource(jedis);
         }
-
-        return (Long)var5;
     }
 
-    public void zAdd(K key, V value, double score) {
-        Jedis jedis = this.jedisPool.getResource();
-        byte[] rawKey = this.rawKey(key);
-        byte[] rawValue = this.rawValue(value);
+    // SortedSet
 
+    public void zAdd(final K key, final V value, final double score) {
+
+        Jedis jedis = jedisSentinelPool.getResource();
+        final byte[] rawKey = rawKey(key);
+        final byte[] rawValue = rawValue(value);
         try {
             jedis.zadd(rawKey, score, rawValue);
-        } catch (Exception var12) {
-            this.returnBrokenResource(jedis, var12);
+        } catch (Exception e) {
+            this.returnBrokenResource(jedis, e);
         } finally {
             this.returnResource(jedis);
         }
-
     }
 
-    public Set<V> zRange(K key, long start, long end) {
-        Jedis jedis = this.jedisPool.getResource();
-        byte[] rawKey = this.rawKey(key);
-
-        Set var9;
+    public Set<V> zRange(final K key, final long start, final long end) {
+        Jedis jedis = jedisSentinelPool.getResource();
+        final byte[] rawKey = rawKey(key);
         try {
-            Set e = jedis.zrange(rawKey, start, end);
-            var9 = this.deserializeValues(e);
-            return var9;
-        } catch (Exception var13) {
-            this.returnBrokenResource(jedis, var13);
-            var9 = null;
+            Set<byte[]> rawValues = jedis.zrange(rawKey, start, end);
+            return deserializeValues(rawValues);
+        } catch (Exception e) {
+            this.returnBrokenResource(jedis, e);
+            return null;
         } finally {
             this.returnResource(jedis);
         }
-
-        return var9;
     }
 
-    public Long zRem(K key, Object... values) {
-        Jedis jedis = this.jedisPool.getResource();
-        byte[] rawKey = this.rawKey(key);
-        byte[][] rawValues = this.rawValues(values);
-
-        Object var7;
+    public Long zRem(final K key, final Object... values) {
+        Jedis jedis = jedisSentinelPool.getResource();
+        final byte[] rawKey = rawKey(key);
+        final byte[][] rawValues = rawValues(values);
         try {
-            Long e = jedis.zrem(rawKey, rawValues);
-            return e;
-        } catch (Exception var11) {
-            this.returnBrokenResource(jedis, var11);
-            var7 = null;
+            return jedis.zrem(rawKey, rawValues);
+        } catch (Exception e) {
+            this.returnBrokenResource(jedis, e);
+            return null;
         } finally {
             this.returnResource(jedis);
         }
-
-        return (Long)var7;
     }
 
     public Long zCard(K key) {
-        Jedis jedis = this.jedisPool.getResource();
-        byte[] rawKey = this.rawKey(key);
-
-        Object var5;
+        Jedis jedis = jedisSentinelPool.getResource();
+        final byte[] rawKey = rawKey(key);
         try {
-            Long e = jedis.zcard(rawKey);
-            return e;
-        } catch (Exception var9) {
-            this.returnBrokenResource(jedis, var9);
-            var5 = null;
+            return jedis.zcard(rawKey);
+        } catch (Exception e) {
+            this.returnBrokenResource(jedis, e);
+            return null;
         } finally {
             this.returnResource(jedis);
         }
-
-        return (Long)var5;
     }
 
     private void returnResource(Jedis jedis) {
         try {
-            this.jedisPool.returnResource(jedis);
-        } catch (Exception var3) {
-            this.jedisPool.returnBrokenResource(jedis);
-            this.logger.warn("Jedis return resource error, " + var3.getMessage(), var3);
+            jedisSentinelPool.returnResource(jedis);
+        } catch (Exception e) {
+            jedisSentinelPool.returnBrokenResource(jedis);
+            logger.warn("Jedis return resource error, " + e.getMessage(), e);
         }
-
     }
 
     private void returnBrokenResource(Jedis jedis, Exception e) {
-        this.jedisPool.returnBrokenResource(jedis);
-        this.logger.error("Jedis operate error, " + e.getMessage(), e);
+        jedisSentinelPool.returnBrokenResource(jedis);
+        logger.error("Jedis operate error, " + e.getMessage(), e);
     }
 }
