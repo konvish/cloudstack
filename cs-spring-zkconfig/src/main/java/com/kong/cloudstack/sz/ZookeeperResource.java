@@ -49,7 +49,7 @@ public class ZookeeperResource extends AbstractResource implements ApplicationCo
     }
 
     public URL getURL() throws IOException {
-        return new URL("zk://" + this.path);
+        return new URL(URL_HEADER + this.path);
     }
 
     public String getFilename() throws IllegalStateException {
@@ -57,7 +57,7 @@ public class ZookeeperResource extends AbstractResource implements ApplicationCo
     }
 
     public String getDescription() {
-        return "Zookeeper resouce at \'zk://" + this.path;
+        return "Zookeeper resouce at '"+URL_HEADER + this.path;
     }
 
     public InputStream getInputStream() throws IOException {
@@ -75,6 +75,7 @@ public class ZookeeperResource extends AbstractResource implements ApplicationCo
         } catch (Exception var7) {
             log.error("zk server error", var7);
 
+            // 读取cmc配置失败时加载本地备份的配置
             try {
                 data = ZKRecoverUtil.loadRecoverData(this.cloud_path);
             } catch (Exception var6) {
@@ -83,6 +84,7 @@ public class ZookeeperResource extends AbstractResource implements ApplicationCo
             }
         }
 
+        // 备份cmc配置到本地
         ZKRecoverUtil.doRecover(data, this.path, this.recoverDataCache);
         ZKRecoverUtil.doRecover(data, this.cloud_path, this.recoverDataCache);
         log.debug("init get startconfig data {}", new String(data));
@@ -92,7 +94,7 @@ public class ZookeeperResource extends AbstractResource implements ApplicationCo
             String originStr = null;
 
             try {
-                originStr = AESUtil.aesDecrypt(new String(pureData), "i love thinkoy, and i love change");
+                originStr = AESUtil.aesDecrypt(new String(pureData), EncryptUtil.encryptKey);
             } catch (Exception var5) {
                 log.error("decrypt error", var5);
                 System.exit(-1);

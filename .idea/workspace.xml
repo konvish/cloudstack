@@ -3,12 +3,9 @@
   <component name="ChangeListManager">
     <list default="true" id="13c61351-47f5-4357-a438-65396c0f2c49" name="Default" comment="">
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/.idea/workspace.xml" afterPath="$PROJECT_DIR$/.idea/workspace.xml" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/cs-spring-redis/build.gradle" afterPath="$PROJECT_DIR$/cs-spring-redis/build.gradle" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/cs-spring-redis/src/main/java/com/kong/cloudstack/cache/IRedisRepository.java" afterPath="$PROJECT_DIR$/cs-spring-redis/src/main/java/com/kong/cloudstack/cache/IRedisRepository.java" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/cs-spring-redis/src/main/java/com/kong/cloudstack/cache/RedisManagerRepository.java" afterPath="$PROJECT_DIR$/cs-spring-redis/src/main/java/com/kong/cloudstack/cache/RedisManagerRepository.java" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/cs-spring-redis/src/main/java/com/kong/cloudstack/cache/RedisRepository.java" afterPath="$PROJECT_DIR$/cs-spring-redis/src/main/java/com/kong/cloudstack/cache/RedisRepository.java" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/cs-spring-redis/src/main/java/com/kong/cloudstack/cache/RedisRepositoryFactory.java" afterPath="$PROJECT_DIR$/cs-spring-redis/src/main/java/com/kong/cloudstack/cache/RedisRepositoryFactory.java" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/cs-spring-redis/src/main/java/com/kong/cloudstack/cache/SimpleRedisRepositoryFactory.java" afterPath="$PROJECT_DIR$/cs-spring-redis/src/main/java/com/kong/cloudstack/cache/SimpleRedisRepositoryFactory.java" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/cs-spring-zkconfig/build.gradle" afterPath="$PROJECT_DIR$/cs-spring-zkconfig/build.gradle" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/cs-spring-zkconfig/src/main/java/com/kong/cloudstack/sz/ZookeeperConfigurer.java" afterPath="$PROJECT_DIR$/cs-spring-zkconfig/src/main/java/com/kong/cloudstack/sz/ZookeeperConfigurer.java" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/cs-spring-zkconfig/src/main/java/com/kong/cloudstack/sz/ZookeeperResource.java" afterPath="$PROJECT_DIR$/cs-spring-zkconfig/src/main/java/com/kong/cloudstack/sz/ZookeeperResource.java" />
     </list>
     <ignored path="cloudstack.iws" />
     <ignored path=".idea/workspace.xml" />
@@ -1957,7 +1954,7 @@
         <entry key="$USER_HOME$/IdeaProjects/qky-resource" value="13075637758702" />
         <entry key="$USER_HOME$/IdeaProjects/qky-resource-webfront" value="1450942807576" />
         <entry key="$USER_HOME$/IdeaProjects/qky-webfront" value="1447639559561" />
-        <entry key="$PROJECT_DIR$" value="17556261335435" />
+        <entry key="$PROJECT_DIR$" value="17572309604890" />
       </map>
     </option>
     <option name="projectBuildClasspath">
@@ -2185,9 +2182,6 @@
   <component name="IdeDocumentHistory">
     <option name="CHANGED_PATHS">
       <list>
-        <option value="$PROJECT_DIR$/cs-dynconfig-client/build.gradle" />
-        <option value="$PROJECT_DIR$/cs-dynconfig-client/src/main/java/com/kong/cloudstack/dynconfig/DynConfigClient.java" />
-        <option value="$PROJECT_DIR$/cs-dynconfig-client/src/main/java/com/kong/cloudstack/dynconfig/ChangeListenerManager.java" />
         <option value="$PROJECT_DIR$/cs-dynconfig-client/src/main/java/com/kong/cloudstack/dynconfig/DynConfigClientFactory.java" />
         <option value="$PROJECT_DIR$/cs-dynconfig-client/src/main/java/com/kong/cloudstack/dynconfig/IChangeListener.java" />
         <option value="$PROJECT_DIR$/cs-dynconfig-client/src/main/java/com/kong/cloudstack/dynconfig/domain/Configuration.java" />
@@ -2236,6 +2230,9 @@
         <option value="$PROJECT_DIR$/cs-spring-redis/src/main/java/com/kong/cloudstack/cache/RedisRepositoryFactory.java" />
         <option value="$PROJECT_DIR$/cs-spring-redis/build.gradle" />
         <option value="$PROJECT_DIR$/cs-spring-redis/src/main/java/com/kong/cloudstack/cache/SimpleRedisRepositoryFactory.java" />
+        <option value="$PROJECT_DIR$/cs-spring-zkconfig/build.gradle" />
+        <option value="$PROJECT_DIR$/cs-spring-zkconfig/src/main/java/com/kong/cloudstack/sz/ZookeeperResource.java" />
+        <option value="$PROJECT_DIR$/cs-spring-zkconfig/src/main/java/com/kong/cloudstack/sz/ZookeeperConfigurer.java" />
       </list>
     </option>
   </component>
@@ -2790,7 +2787,7 @@
     </configuration>
   </component>
   <component name="SbtLocalSettings">
-    <option name="lastUpdateTimestamp" value="1469501085127" />
+    <option name="lastUpdateTimestamp" value="1469501445632" />
     <option name="externalProjectsViewState">
       <projects_view />
     </option>
@@ -2815,7 +2812,7 @@
       <workItem from="1455715990076" duration="1203000" />
       <workItem from="1455717228629" duration="571000" />
       <workItem from="1469436353976" duration="4546000" />
-      <workItem from="1469495583678" duration="5620000" />
+      <workItem from="1469495583678" duration="6070000" />
     </task>
     <task id="LOCAL-00001" summary="修改依赖支持">
       <created>1469438348648</created>
@@ -2880,11 +2877,18 @@
       <option name="project" value="LOCAL" />
       <updated>1469500277117</updated>
     </task>
-    <option name="localTasksCounter" value="10" />
+    <task id="LOCAL-00010" summary="增加cs-spring-redis的注释">
+      <created>1469501311536</created>
+      <option name="number" value="00010" />
+      <option name="presentableId" value="LOCAL-00010" />
+      <option name="project" value="LOCAL" />
+      <updated>1469501311536</updated>
+    </task>
+    <option name="localTasksCounter" value="11" />
     <servers />
   </component>
   <component name="TimeTrackingManager">
-    <option name="totallyTimeSpent" value="35093000" />
+    <option name="totallyTimeSpent" value="35543000" />
   </component>
   <component name="ToolWindowManager">
     <frame x="516" y="7" width="1277" height="1040" extended-state="0" />
@@ -2892,6 +2896,7 @@
     <layout>
       <window_info id="Palette" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="3" side_tool="false" content_ui="tabs" />
       <window_info id="TODO" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="6" side_tool="false" content_ui="tabs" />
+      <window_info id="Messages" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.32747254" sideWeight="0.5" order="7" side_tool="false" content_ui="tabs" />
       <window_info id="Palette&#9;" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="2" side_tool="false" content_ui="tabs" />
       <window_info id="Capture Analysis" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="4" side_tool="false" content_ui="tabs" />
       <window_info id="Event Log" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="7" side_tool="true" content_ui="tabs" />
@@ -2914,7 +2919,6 @@
       <window_info id="Application Servers" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="7" side_tool="false" content_ui="tabs" />
       <window_info id="Hierarchy" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.25" sideWeight="0.5" order="2" side_tool="false" content_ui="combo" />
       <window_info id="Debug" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.4" sideWeight="0.5" order="3" side_tool="false" content_ui="tabs" />
-      <window_info id="Messages" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.32842582" sideWeight="0.5" order="7" side_tool="false" content_ui="tabs" />
       <window_info id="Inspection" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.4" sideWeight="0.5" order="5" side_tool="false" content_ui="tabs" />
       <window_info id="Run" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="2" side_tool="false" content_ui="tabs" />
       <window_info id="Find" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="1" side_tool="false" content_ui="tabs" />
@@ -2933,7 +2937,8 @@
     <MESSAGE value="增加cs-common的注释" />
     <MESSAGE value="增加cs-context的注释" />
     <MESSAGE value="增加cs-monitor-client的注释" />
-    <option name="LAST_COMMIT_MESSAGE" value="增加cs-monitor-client的注释" />
+    <MESSAGE value="增加cs-spring-redis的注释" />
+    <option name="LAST_COMMIT_MESSAGE" value="增加cs-spring-redis的注释" />
   </component>
   <component name="XDebuggerManager">
     <breakpoint-manager>
@@ -2942,37 +2947,6 @@
     <watches-manager />
   </component>
   <component name="editorHistoryManager">
-    <entry file="file://$PROJECT_DIR$/cs-cache/src/main/java/com/kong/cache/spring/ClassNamedCacheResolver.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="340">
-          <caret line="27" column="22" selection-start-line="27" selection-start-column="22" selection-end-line="27" selection-end-column="22" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/cs-cache/src/main/java/com/kong/cache/spring/HybirdCacheManager.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="68">
-          <caret line="13" column="8" selection-start-line="13" selection-start-column="8" selection-end-line="13" selection-end-column="8" />
-          <folding />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/cs-cache/src/main/java/com/kong/cache/spring/HybirdCache.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="850">
-          <caret line="60" column="64" selection-start-line="60" selection-start-column="64" selection-end-line="60" selection-end-column="64" />
-          <folding />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/cs-client-core/src/main/java/com/kong/cloudstack/client/zookeeper/recover/ZKRecoverUtil.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="689">
-          <caret line="74" column="19" selection-start-line="74" selection-start-column="19" selection-end-line="74" selection-end-column="19" />
-          <folding />
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/cs-client-core/src/main/java/com/kong/cloudstack/client/zookeeper/ZKClient.java">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="85">
@@ -3375,6 +3349,38 @@
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="291">
           <caret line="89" column="51" selection-start-line="89" selection-start-column="51" selection-end-line="89" selection-end-column="51" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/cs-spring-zkconfig/build.gradle">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="68">
+          <caret line="4" column="22" selection-start-line="4" selection-start-column="22" selection-end-line="4" selection-end-column="22" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/cs-spring-zkconfig/src/main/java/com/kong/cloudstack/sz/ZookeeperResource.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="631">
+          <caret line="95" column="17" selection-start-line="95" selection-start-column="17" selection-end-line="95" selection-end-column="17" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/cs-spring-zkconfig/src/main/java/com/kong/cloudstack/sz/ZookeeperConfigurer.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="32">
+          <caret line="2" column="7" selection-start-line="2" selection-start-column="7" selection-end-line="2" selection-end-column="7" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/cs-spring-zkconfig/src/main/java/com/kong/cloudstack/sz/util/EncryptUtil.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="102">
+          <caret line="6" column="13" selection-start-line="6" selection-start-column="13" selection-end-line="6" selection-end-column="13" />
           <folding />
         </state>
       </provider>

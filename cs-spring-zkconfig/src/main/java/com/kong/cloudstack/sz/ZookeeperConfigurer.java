@@ -1,6 +1,11 @@
 package com.kong.cloudstack.sz;
 
-import com.kong.cloudstack.sz.ZookeeperResource;
+import org.springframework.beans.BeansException;
+import org.springframework.beans.factory.config.ConfigurableListableBeanFactory;
+import org.springframework.context.support.PropertySourcesPlaceholderConfigurer;
+import org.springframework.core.env.ConfigurablePropertyResolver;
+import org.springframework.core.io.Resource;
+
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
@@ -8,12 +13,8 @@ import java.net.URI;
 import java.net.URL;
 import java.util.HashMap;
 import java.util.Map;
-import org.springframework.beans.BeansException;
-import org.springframework.beans.factory.config.ConfigurableListableBeanFactory;
-import org.springframework.context.support.PropertySourcesPlaceholderConfigurer;
-import org.springframework.core.env.ConfigurablePropertyResolver;
-import org.springframework.core.io.Resource;
 /**
+ *
  * Created by kong on 2016/1/24.
  */
 public class ZookeeperConfigurer extends PropertySourcesPlaceholderConfigurer {
