@@ -1,6 +1,7 @@
 package com.kong.monitor.model;
 
 /**
+ * 监控事件，所有的监控使用此事件模型处理
  * Created by kong on 2016/1/22.
  */
 import com.kong.monitor.model.Event;
@@ -36,11 +37,16 @@ public class FormatMonitorEvent implements Event {
     }
 
     public static class Builder {
+        /** 事件名称 */
         private final String name;
-        private final FormatMonitorEvent.MetaData metadata;
+        /** event元数据 props的key列表，在log中不显示，减少log文件大小 */
+        private final MetaData metadata;
+        /** traceid 链式的追踪id */
         private final String tid;
         private final String eventType;
+        /** 业务操作的主体方 */
         private final String externalUserId;
+        /** 附带信息 */
         private Map<String, String> properties;
 
         public Builder(String name, FormatMonitorEvent.MetaData metadata, String tid, String eventType, String externalUserId, Map<String, String> properties) {
@@ -58,7 +64,7 @@ public class FormatMonitorEvent implements Event {
         }
 
         public FormatMonitorEvent build() {
-            HashMap allProperties = Maps.newHashMap();
+            HashMap<String,String> allProperties = Maps.newHashMap();
             allProperties.putAll(this.properties);
             allProperties.put("name", this.name);
             allProperties.put("event_type", this.eventType);

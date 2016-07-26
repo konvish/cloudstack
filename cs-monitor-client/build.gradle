@@ -4,4 +4,5 @@ dependencies {
     compile 'ch.qos.logback:logback-classic:1.1.3'
     compile 'com.google.guava:guava:19.0'
     compile 'org.apache.commons:commons-proxy:1.0'
+    compile project(":cs-common")
 }

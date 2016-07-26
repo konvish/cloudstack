@@ -1,15 +1,16 @@
 package com.kong.monitor;
 
-import com.kong.monitor.LoggerGaugeDataStore;
-import java.util.Collection;
-import java.util.Iterator;
 import org.apache.sirona.counters.Counter;
-import org.apache.sirona.counters.MetricData;
 import org.apache.sirona.counters.Counter.Key;
+import org.apache.sirona.counters.MetricData;
 import org.apache.sirona.store.counter.BatchCounterDataStore;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import java.util.Collection;
+import java.util.Iterator;
 /**
+ *
  * Created by kong on 2016/1/24.
  */
 public class LoggerCounterDataStore extends BatchCounterDataStore {

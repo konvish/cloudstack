@@ -1,245 +1,355 @@
+/*
+ * Written by Doug Lea with assistance from members of JCP JSR-166
+ * Expert Group and released to the public domain, as explained at
+ * http://creativecommons.org/publicdomain/zero/1.0/
+ *
+ * http://gee.cs.oswego.edu/cgi-bin/viewcvs.cgi/jsr166/src/jsr166e/Striped64.java?revision=1.8&view=markup
+ */
+
 package com.kong.monitor.model;
 
-import sun.misc.Unsafe;
-
-import java.lang.reflect.Field;
-import java.security.AccessController;
-import java.security.PrivilegedActionException;
-import java.security.PrivilegedExceptionAction;
 import java.util.Random;
+
+// CHECKSTYLE:OFF
+
 /**
- * Created by kong on 2016/1/22.
+ * A package-local class holding common representation and mechanics for classes supporting dynamic
+ * striping on 64bit values. The class extends Number so that concrete subclasses must publicly do
+ * so.
  */
+@SuppressWarnings("all")
 abstract class Striped64 extends Number {
-    static final Striped64.ThreadHashCode threadHashCode = new Striped64.ThreadHashCode();
-    static final int NCPU = Runtime.getRuntime().availableProcessors();
-    transient volatile Striped64.Cell[] cells;
-    transient volatile long base;
-    transient volatile int busy;
-    private static final Unsafe UNSAFE;
-    private static final long baseOffset;
-    private static final long busyOffset;
+    /*
+     * This class maintains a lazily-initialized table of atomically
+     * updated variables, plus an extra "base" field. The table size
+     * is a power of two. Indexing uses masked per-thread hash codes.
+     * Nearly all declarations in this class are package-private,
+     * accessed directly by subclasses.
+     *
+     * Table entries are of class Cell; a variant of AtomicLong padded
+     * to reduce cache contention on most processors. Padding is
+     * overkill for most Atomics because they are usually irregularly
+     * scattered in memory and thus don't interfere much with each
+     * other. But Atomic objects residing in arrays will tend to be
+     * placed adjacent to each other, and so will most often share
+     * cache lines (with a huge negative performance impact) without
+     * this precaution.
+     *
+     * In part because Cells are relatively large, we avoid creating
+     * them until they are needed.  When there is no contention, all
+     * updates are made to the base field.  Upon first contention (a
+     * failed CAS on base update), the table is initialized to size 2.
+     * The table size is doubled upon further contention until
+     * reaching the nearest power of two greater than or equal to the
+     * number of CPUS. Table slots remain empty (null) until they are
+     * needed.
+     *
+     * A single spinlock ("busy") is used for initializing and
+     * resizing the table, as well as populating slots with new Cells.
+     * There is no need for a blocking lock; when the lock is not
+     * available, threads try other slots (or the base).  During these
+     * retries, there is increased contention and reduced locality,
+     * which is still better than alternatives.
+     *
+     * Per-thread hash codes are initialized to random values.
+     * Contention and/or table collisions are indicated by failed
+     * CASes when performing an update operation (see method
+     * retryUpdate). Upon a collision, if the table size is less than
+     * the capacity, it is doubled in size unless some other thread
+     * holds the lock. If a hashed slot is empty, and lock is
+     * available, a new Cell is created. Otherwise, if the slot
+     * exists, a CAS is tried.  Retries proceed by "double hashing",
+     * using a secondary hash (Marsaglia XorShift) to try to find a
+     * free slot.
+     *
+     * The table size is capped because, when there are more threads
+     * than CPUs, supposing that each thread were bound to a CPU,
+     * there would exist a perfect hash function mapping threads to
+     * slots that eliminates collisions. When we reach capacity, we
+     * search for this mapping by randomly varying the hash codes of
+     * colliding threads.  Because search is random, and collisions
+     * only become known via CAS failures, convergence can be slow,
+     * and because threads are typically not bound to CPUS forever,
+     * may not occur at all. However, despite these limitations,
+     * observed contention rates are typically low in these cases.
+     *
+     * It is possible for a Cell to become unused when threads that
+     * once hashed to it terminate, as well as in the case where
+     * doubling the table causes no thread to hash to it under
+     * expanded mask.  We do not try to detect or remove such cells,
+     * under the assumption that for long-running instances, observed
+     * contention levels will recur, so the cells will eventually be
+     * needed again; and for short-lived ones, it does not matter.
+     */
 
-    Striped64() {
-    }
-
-    final boolean casBase(long cmp, long val) {
-        return UNSAFE.compareAndSwapLong(this, baseOffset, cmp, val);
-    }
-
-    final boolean casBusy() {
-        return UNSAFE.compareAndSwapInt(this, busyOffset, 0, 1);
-    }
-
-    abstract long fn(long var1, long var3);
-
-    final void retryUpdate(long x, Striped64.HashCode hc, boolean wasUncontended) {
-        int h = hc.code;
-        boolean collide = false;
-
-        while(true) {
-            Striped64.Cell[] as = this.cells;
-            int n;
-            long v;
-            if(this.cells != null && (n = as.length) > 0) {
-                Striped64.Cell a;
-                if((a = as[n - 1 & h]) == null) {
-                    if(this.busy == 0) {
-                        Striped64.Cell var32 = new Striped64.Cell(x);
-                        if(this.busy == 0 && this.casBusy()) {
-                            boolean var33 = false;
-
-                            try {
-                                Striped64.Cell[] rs1 = this.cells;
-                                int m;
-                                int j;
-                                if(this.cells != null && (m = rs1.length) > 0 && rs1[j = m - 1 & h] == null) {
-                                    rs1[j] = var32;
-                                    var33 = true;
-                                }
-                            } finally {
-                                this.busy = 0;
-                            }
-
-                            if(var33) {
-                                break;
-                            }
-                            continue;
-                        }
-                    }
-
-                    collide = false;
-                } else if(!wasUncontended) {
-                    wasUncontended = true;
-                } else {
-                    if(a.cas(v = a.value, this.fn(v, x))) {
-                        break;
-                    }
-
-                    if(n < NCPU && this.cells == as) {
-                        if(!collide) {
-                            collide = true;
-                        } else if(this.busy == 0 && this.casBusy()) {
-                            try {
-                                if(this.cells == as) {
-                                    Striped64.Cell[] var34 = new Striped64.Cell[n << 1];
-
-                                    for(int var35 = 0; var35 < n; ++var35) {
-                                        var34[var35] = as[var35];
-                                    }
-
-                                    this.cells = var34;
-                                }
-                            } finally {
-                                this.busy = 0;
-                            }
-
-                            collide = false;
-                            continue;
-                        }
-                    } else {
-                        collide = false;
-                    }
-                }
-
-                h ^= h << 13;
-                h ^= h >>> 17;
-                h ^= h << 5;
-            } else if(this.busy == 0 && this.cells == as && this.casBusy()) {
-                boolean init = false;
-
-                try {
-                    if(this.cells == as) {
-                        Striped64.Cell[] rs = new Striped64.Cell[2];
-                        rs[h & 1] = new Striped64.Cell(x);
-                        this.cells = rs;
-                        init = true;
-                    }
-                } finally {
-                    this.busy = 0;
-                }
-
-                if(init) {
-                    break;
-                }
-            } else if(this.casBase(v = this.base, this.fn(v, x))) {
-                break;
-            }
-        }
-
-        hc.code = h;
-    }
-
-    final void internalReset(long initialValue) {
-        Striped64.Cell[] as = this.cells;
-        this.base = initialValue;
-        if(as != null) {
-            int n = as.length;
-
-            for(int i = 0; i < n; ++i) {
-                Striped64.Cell a = as[i];
-                if(a != null) {
-                    a.value = initialValue;
-                }
-            }
-        }
-
-    }
-
-    private static Unsafe getUnsafe() {
-        try {
-            return Unsafe.getUnsafe();
-        } catch (SecurityException var2) {
-            try {
-                return (Unsafe)AccessController.doPrivileged(new PrivilegedExceptionAction() {
-                    public Unsafe run() throws Exception {
-                        Class k = Unsafe.class;
-                        Field[] arr$ = k.getDeclaredFields();
-                        int len$ = arr$.length;
-
-                        for(int i$ = 0; i$ < len$; ++i$) {
-                            Field f = arr$[i$];
-                            f.setAccessible(true);
-                            Object x = f.get((Object)null);
-                            if(k.isInstance(x)) {
-                                return (Unsafe)k.cast(x);
-                            }
-                        }
-
-                        throw new NoSuchFieldError("the Unsafe");
-                    }
-                });
-            } catch (PrivilegedActionException var1) {
-                throw new RuntimeException("Could not initialize intrinsics", var1.getCause());
-            }
-        }
-    }
-
-    static {
-        try {
-            UNSAFE = getUnsafe();
-            Class e = Striped64.class;
-            baseOffset = UNSAFE.objectFieldOffset(e.getDeclaredField("base"));
-            busyOffset = UNSAFE.objectFieldOffset(e.getDeclaredField("busy"));
-        } catch (Exception var1) {
-            throw new Error(var1);
-        }
-    }
-
-    static final class ThreadHashCode extends ThreadLocal<Striped64.HashCode> {
-        ThreadHashCode() {
-        }
-
-        public Striped64.HashCode initialValue() {
-            return new Striped64.HashCode();
-        }
-    }
-
-    static final class HashCode {
-        static final Random rng = new Random();
-        int code;
-
-        HashCode() {
-            int h = rng.nextInt();
-            this.code = h == 0?1:h;
-        }
-    }
-
+    /**
+     * Padded variant of AtomicLong supporting only raw accesses plus CAS. The value field is placed
+     * between pads, hoping that the JVM doesn't reorder them.
+     * <p/>
+     * JVM intrinsics note: It would be possible to use a release-only form of CAS here, if it were
+     * provided.
+     */
     static final class Cell {
-        volatile long p0;
-        volatile long p1;
-        volatile long p2;
-        volatile long p3;
-        volatile long p4;
-        volatile long p5;
-        volatile long p6;
+        volatile long p0, p1, p2, p3, p4, p5, p6;
         volatile long value;
-        volatile long q0;
-        volatile long q1;
-        volatile long q2;
-        volatile long q3;
-        volatile long q4;
-        volatile long q5;
-        volatile long q6;
-        private static final Unsafe UNSAFE;
-        private static final long valueOffset;
+        volatile long q0, q1, q2, q3, q4, q5, q6;
 
         Cell(long x) {
-            this.value = x;
+            value = x;
         }
 
         final boolean cas(long cmp, long val) {
             return UNSAFE.compareAndSwapLong(this, valueOffset, cmp, val);
         }
 
+        // Unsafe mechanics
+        private static final sun.misc.Unsafe UNSAFE;
+        private static final long valueOffset;
+
         static {
             try {
-                UNSAFE = Striped64.getUnsafe();
-                Class e = Striped64.Cell.class;
-                valueOffset = UNSAFE.objectFieldOffset(e.getDeclaredField("value"));
-            } catch (Exception var1) {
-                throw new Error(var1);
+                UNSAFE = getUnsafe();
+                Class<?> ak = Cell.class;
+                valueOffset = UNSAFE.objectFieldOffset
+                        (ak.getDeclaredField("value"));
+            } catch (Exception e) {
+                throw new Error(e);
+            }
+        }
+
+    }
+
+    /**
+     * Holder for the thread-local hash code. The code is initially random, but may be set to a
+     * different value upon collisions.
+     */
+    static final class HashCode {
+        static final Random rng = new Random();
+        int code;
+
+        HashCode() {
+            int h = rng.nextInt(); // Avoid zero to allow xorShift rehash
+            code = (h == 0) ? 1 : h;
+        }
+    }
+
+    /**
+     * The corresponding ThreadLocal class
+     */
+    static final class ThreadHashCode extends ThreadLocal<HashCode> {
+        public HashCode initialValue() {
+            return new HashCode();
+        }
+    }
+
+    /**
+     * Static per-thread hash codes. Shared across all instances to reduce ThreadLocal pollution and
+     * because adjustments due to collisions in one table are likely to be appropriate for others.
+     */
+    static final ThreadHashCode threadHashCode = new ThreadHashCode();
+
+    /**
+     * Number of CPUS, to place bound on table size
+     */
+    static final int NCPU = Runtime.getRuntime().availableProcessors();
+
+    /**
+     * Table of cells. When non-null, size is a power of 2.
+     */
+    transient volatile Cell[] cells;
+
+    /**
+     * Base value, used mainly when there is no contention, but also as a fallback during table
+     * initialization races. Updated via CAS.
+     */
+    transient volatile long base;
+
+    /**
+     * Spinlock (locked via CAS) used when resizing and/or creating Cells.
+     */
+    transient volatile int busy;
+
+    /**
+     * Package-private default constructor
+     */
+    Striped64() {
+    }
+
+    /**
+     * CASes the base field.
+     */
+    final boolean casBase(long cmp, long val) {
+        return UNSAFE.compareAndSwapLong(this, baseOffset, cmp, val);
+    }
+
+    /**
+     * CASes the busy field from 0 to 1 to acquire lock.
+     */
+    final boolean casBusy() {
+        return UNSAFE.compareAndSwapInt(this, busyOffset, 0, 1);
+    }
+
+    /**
+     * Computes the function of current and new value. Subclasses should open-code this update
+     * function for most uses, but the virtualized form is needed within retryUpdate.
+     *
+     * @param currentValue the current value (of either base or a cell)
+     * @param newValue     the argument from a user update call
+     * @return result of the update function
+     */
+    abstract long fn(long currentValue, long newValue);
+
+    /**
+     * Handles cases of updates involving initialization, resizing, creating new Cells, and/or
+     * contention. See above for explanation. This method suffers the usual non-modularity problems
+     * of optimistic retry code, relying on rechecked sets of reads.
+     *
+     * @param x              the value
+     * @param hc             the hash code holder
+     * @param wasUncontended false if CAS failed before call
+     */
+    final void retryUpdate(long x, HashCode hc, boolean wasUncontended) {
+        int h = hc.code;
+        boolean collide = false;                // True if last slot nonempty
+        for (; ; ) {
+            Cell[] as;
+            Cell a;
+            int n;
+            long v;
+            if ((as = cells) != null && (n = as.length) > 0) {
+                if ((a = as[(n - 1) & h]) == null) {
+                    if (busy == 0) {            // Try to attach new Cell
+                        Cell r = new Cell(x);   // Optimistically create
+                        if (busy == 0 && casBusy()) {
+                            boolean created = false;
+                            try {               // Recheck under lock
+                                Cell[] rs;
+                                int m, j;
+                                if ((rs = cells) != null &&
+                                        (m = rs.length) > 0 &&
+                                        rs[j = (m - 1) & h] == null) {
+                                    rs[j] = r;
+                                    created = true;
+                                }
+                            } finally {
+                                busy = 0;
+                            }
+                            if (created)
+                                break;
+                            continue;           // Slot is now non-empty
+                        }
+                    }
+                    collide = false;
+                } else if (!wasUncontended)       // CAS already known to fail
+                    wasUncontended = true;      // Continue after rehash
+                else if (a.cas(v = a.value, fn(v, x)))
+                    break;
+                else if (n >= NCPU || cells != as)
+                    collide = false;            // At max size or stale
+                else if (!collide)
+                    collide = true;
+                else if (busy == 0 && casBusy()) {
+                    try {
+                        if (cells == as) {      // Expand table unless stale
+                            Cell[] rs = new Cell[n << 1];
+                            for (int i = 0; i < n; ++i)
+                                rs[i] = as[i];
+                            cells = rs;
+                        }
+                    } finally {
+                        busy = 0;
+                    }
+                    collide = false;
+                    continue;                   // Retry with expanded table
+                }
+                h ^= h << 13;                   // Rehash
+                h ^= h >>> 17;
+                h ^= h << 5;
+            } else if (busy == 0 && cells == as && casBusy()) {
+                boolean init = false;
+                try {                           // Initialize table
+                    if (cells == as) {
+                        Cell[] rs = new Cell[2];
+                        rs[h & 1] = new Cell(x);
+                        cells = rs;
+                        init = true;
+                    }
+                } finally {
+                    busy = 0;
+                }
+                if (init)
+                    break;
+            } else if (casBase(v = base, fn(v, x)))
+                break;                          // Fall back on using base
+        }
+        hc.code = h;                            // Record index for next time
+    }
+
+
+    /**
+     * Sets base and all cells to the given value.
+     */
+    final void internalReset(long initialValue) {
+        Cell[] as = cells;
+        base = initialValue;
+        if (as != null) {
+            int n = as.length;
+            for (int i = 0; i < n; ++i) {
+                Cell a = as[i];
+                if (a != null)
+                    a.value = initialValue;
             }
         }
     }
+
+    // Unsafe mechanics
+    private static final sun.misc.Unsafe UNSAFE;
+    private static final long baseOffset;
+    private static final long busyOffset;
+
+    static {
+        try {
+            UNSAFE = getUnsafe();
+            Class<?> sk = Striped64.class;
+            baseOffset = UNSAFE.objectFieldOffset
+                    (sk.getDeclaredField("base"));
+            busyOffset = UNSAFE.objectFieldOffset
+                    (sk.getDeclaredField("busy"));
+        } catch (Exception e) {
+            throw new Error(e);
+        }
+    }
+
+    /**
+     * Returns a sun.misc.Unsafe.  Suitable for use in a 3rd party package. Replace with a simple
+     * call to Unsafe.getUnsafe when integrating into a jdk.
+     *
+     * @return a sun.misc.Unsafe
+     */
+    private static sun.misc.Unsafe getUnsafe() {
+        try {
+            return sun.misc.Unsafe.getUnsafe();
+        } catch (SecurityException ignored) {
+
+        }
+        try {
+            return java.security.AccessController.doPrivileged
+                    (new java.security.PrivilegedExceptionAction<sun.misc.Unsafe>() {
+                        public sun.misc.Unsafe run() throws Exception {
+                            Class<sun.misc.Unsafe> k = sun.misc.Unsafe.class;
+                            for (java.lang.reflect.Field f : k.getDeclaredFields()) {
+                                f.setAccessible(true);
+                                Object x = f.get(null);
+                                if (k.isInstance(x))
+                                    return k.cast(x);
+                            }
+                            throw new NoSuchFieldError("the Unsafe");
+                        }
+                    });
+        } catch (java.security.PrivilegedActionException e) {
+            throw new RuntimeException("Could not initialize intrinsics",
+                    e.getCause());
+        }
+    }
 }
+// CHECKSTYLE:ON

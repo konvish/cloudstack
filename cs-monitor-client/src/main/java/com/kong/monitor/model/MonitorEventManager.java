@@ -2,96 +2,99 @@ package com.kong.monitor.model;
 
 import com.kong.cloudstack.AbstractLifecycle;
 import com.kong.cloudstack.utils.NamedThreadFactory;
-import com.kong.monitor.model.MonitorEventContainer;
-import java.util.concurrent.Executors;
-import java.util.concurrent.ScheduledExecutorService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+
 /**
- * Created by kong on 2016/1/24.
+ * MonitorEventContainer 管理器  会对container进行相应的清理工作
+ * <p/>
+ * Created by kong on 2016/1/22.
  */
-public class MonitorEventManager extends AbstractLifecycle {
+public class MonitorEventManager extends AbstractLifecycle{
     public static final Logger logger = LoggerFactory.getLogger(MonitorEventManager.class);
 
-    private MonitorEventManager() {
+    private MonitorEventManager(){}
+
+    public static class MonitorEventManagerHolder{
+        private static MonitorEventManager instance = new MonitorEventManager();
     }
 
-    public static MonitorEventManager getInstance() {
-        return MonitorEventManager.MonitorEventManagerHolder.instance;
+    public static MonitorEventManager getInstance(){
+        return MonitorEventManagerHolder.instance;
     }
 
+    @Override
     protected void doStart() {
         MonitorEventContainer.getInstance().init();
-        ScheduledExecutorService executor = Executors.newScheduledThreadPool(1, new NamedThreadFactory("METASTORE"));
+
+        //定期将元数据描述刷新到本地文件
+        ExecutorService executor = Executors.newScheduledThreadPool(1, new NamedThreadFactory("METASTORE"));
         executor.execute(new Runnable() {
+            @Override
             public void run() {
-                long startTime = 0L;
-                long interval = 0L;
-
+                long startTime = 0;
+                long interval = 0;
                 while(true) {
-                    do {
-                        startTime = System.currentTimeMillis();
-                        MonitorEventContainer.getInstance().metaStore();
-                        interval = System.currentTimeMillis() - startTime;
-                    } while(interval >= 1000L);
-
-                    try {
-                        Thread.sleep(1000L);
-                    } catch (InterruptedException var6) {
-                        MonitorEventManager.logger.error("sleep error", var6);
-                    }
-                }
-            }
-        });
-        boolean minWinSize = true;
-        boolean maxWinSise = true;
-        boolean deltaTime = true;
-        ScheduledExecutorService logFlushExecutor = Executors.newScheduledThreadPool(1, new NamedThreadFactory("LOGFLUSH"));
-        logFlushExecutor.execute(new Runnable() {
-            public void run() {
-                boolean sleepTime = true;
-                boolean eventCount = false;
-
-                while(true) {
-                    while(true) {
+                    startTime = System.currentTimeMillis();
+                    MonitorEventContainer.getInstance().metaStore();
+                    interval = System.currentTimeMillis() - startTime;
+                    if(interval < 1000){ //太快，停一下
                         try {
-                            int eventCount1 = MonitorEventContainer.getInstance().getEventCount();
-                            int sleepTime1;
-                            if(eventCount1 > 10000) {
-                                sleepTime1 = 0;
-                            } else if(eventCount1 > 1000 && eventCount1 < 10000) {
-                                sleepTime1 = 1000 - eventCount1 % 1000 * 100;
-                            } else {
-                                sleepTime1 = 1000;
-                            }
-
-                            MonitorEventContainer.getInstance().flushLog();
-
-                            try {
-                                Thread.sleep((long)sleepTime1);
-                                MonitorEventManager.logger.debug("logflush period is {}", Integer.valueOf(sleepTime1));
-                            } catch (InterruptedException var4) {
-                                MonitorEventManager.logger.error("sleep error", var4);
-                            }
-                        } catch (Exception var5) {
-                            MonitorEventManager.logger.error("logFlush error!", var5);
+                            Thread.sleep(1000);
+                        } catch (InterruptedException e) {
+                            logger.error("sleep error", e);
                         }
                     }
                 }
             }
         });
+
+        //定期将内存数据刷到磁盘  采用简单的拥塞算法   窗口大小后续可以动态调整
+        final int minWinSize = 1000;
+        final int maxWinSise = 10000;
+        final int deltaTime = 100;
+        ExecutorService logFlushExecutor = Executors.newScheduledThreadPool(1, new NamedThreadFactory("LOGFLUSH"));
+        logFlushExecutor.execute(new Runnable() {
+            @Override
+            public void run() {
+                //默认1秒
+                int sleepTime = 1000;
+                int eventCount = 0;
+                while (true) {
+                    try {
+                        eventCount = MonitorEventContainer.getInstance().getEventCount();
+                        if(eventCount > maxWinSise){
+                            sleepTime = 0;
+                        } else if(eventCount > minWinSize && eventCount < maxWinSise){
+                            sleepTime = 1000 -  (eventCount % minWinSize) * deltaTime;
+                        } else {
+                            sleepTime = 1000;
+                        }
+                        MonitorEventContainer.getInstance().flushLog();
+
+                        try {
+                            Thread.sleep(sleepTime);
+                            logger.debug("logflush period is {}", sleepTime);
+                        } catch (InterruptedException e) {
+                            logger.error("sleep error", e);
+                        }
+                    } catch (Exception e) {
+                        logger.error("logFlush error!", e);
+                    }
+                }
+            }
+        });
     }
 
+    @Override
     public void stop() {
+        //MonitorEventContainer.getInstance().destory();
     }
 
-    public void addMonitor() {
-    }
+    public void addMonitor(){
 
-    public static class MonitorEventManagerHolder {
-        private static MonitorEventManager instance = new MonitorEventManager();
-
-        public MonitorEventManagerHolder() {
-        }
     }
 }

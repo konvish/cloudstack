@@ -9,6 +9,7 @@ import org.apache.sirona.store.gauge.Value;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 /**
+ *
  * Created by kong on 2016/1/24.
  */
 public class LoggerGaugeDataStore extends AggregatedGaugeDataStoreAdapter {
