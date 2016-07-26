@@ -13,19 +13,41 @@ import org.apache.curator.x.discovery.details.JsonInstanceSerializer;
 import java.io.Closeable;
 import java.io.IOException;
 /**
+ * This shows a very simplified method of registering an instance with the service discovery. Each individual
+ * instance in your distributed set of applications would create an instance of something similar to ZKAliveServer,
+ * start it when the application comes up and close it when the application shuts down.
+ *
  * Created by kong on 2016/1/24.
  */
 public class ZKAliveServer implements Closeable {
     private final ServiceDiscovery<InstanceDetails> serviceDiscovery;
     private final ServiceInstance<InstanceDetails> thisInstance;
 
-    public ZKAliveServer(CuratorFramework client, String path, String serviceName, String description) throws Exception {
+    public ZKAliveServer(CuratorFramework client, String path, String serviceName, String description) throws Exception
+    {
         String formatter = "{%s}://%s:{%d}";
-        UriSpec uriSpec = new UriSpec(String.format(formatter, new Object[]{"tcp", NetUtil.getLocalHost(), Integer.valueOf(CloudContextFactory.getCloudContext().getPort())}));
-        ServiceInstance<Object> build = ServiceInstance.builder().id(CloudContextFactory.getCloudContext().getId()).name(serviceName).payload(new InstanceDetails(description)).port(CloudContextFactory.getCloudContext().getPort()).uriSpec(uriSpec).address(NetUtil.getLocalHost() + "/" + NetUtil.getLocalAddress().getHostName()).build();
-        this.thisInstance =(ServiceInstance)build;
-        JsonInstanceSerializer serializer = new JsonInstanceSerializer(InstanceDetails.class);
-        this.serviceDiscovery = ServiceDiscoveryBuilder.builder(InstanceDetails.class).client(client).basePath(path).serializer(serializer).thisInstance(this.thisInstance).build();
+
+        UriSpec uriSpec = new UriSpec(String.format(formatter, "tcp",NetUtil.getLocalHost(),CloudContextFactory.getCloudContext().getPort()));
+
+        //address 为内网ip/hostname
+        thisInstance = ServiceInstance.<InstanceDetails>builder()
+                .id(CloudContextFactory.getCloudContext().getId())
+                .name(serviceName)
+                .payload(new InstanceDetails(description))
+                .port(CloudContextFactory.getCloudContext().getPort())
+                .uriSpec(uriSpec)
+                .address(NetUtil.getLocalHost() + "/" + NetUtil.getLocalAddress().getHostName())
+                .build();
+
+        // if you mark your payload class with @JsonRootName the provided JsonInstanceSerializer will work
+        JsonInstanceSerializer<InstanceDetails> serializer = new JsonInstanceSerializer<InstanceDetails>(InstanceDetails.class);
+
+        serviceDiscovery = ServiceDiscoveryBuilder.builder(InstanceDetails.class)
+                .client(client)
+                .basePath(path)
+                .serializer(serializer)
+                .thisInstance(thisInstance)
+                .build();
     }
 
     public ServiceInstance<InstanceDetails> getThisInstance() {

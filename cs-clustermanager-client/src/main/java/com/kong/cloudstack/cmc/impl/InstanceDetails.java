@@ -2,6 +2,7 @@ package com.kong.cloudstack.cmc.impl;
 
 import org.codehaus.jackson.map.annotate.JsonRootName;
 /**
+ *
  * Created by kong on 2016/1/24.
  */
 @JsonRootName("details")

@@ -24,6 +24,7 @@ import java.util.Set;
 import java.util.concurrent.Executor;
 import java.util.concurrent.Executors;
 import org.apache.curator.framework.CuratorFramework;
+import org.apache.curator.framework.recipes.cache.PathChildrenCacheEvent;
 import org.apache.curator.framework.recipes.cache.PathChildrenCacheEvent.Type;
 import org.apache.curator.x.discovery.ServiceDiscovery;
 import org.apache.curator.x.discovery.ServiceDiscoveryBuilder;
@@ -32,6 +33,7 @@ import org.apache.curator.x.discovery.details.JsonInstanceSerializer;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 /**
+ * 注册(使用zk管理）
  * Created by kong on 2016/1/24.
  */
 public class ZKClusterManagerClient implements IClusterManagerClient {
@@ -41,10 +43,16 @@ public class ZKClusterManagerClient implements IClusterManagerClient {
     private static final String CLOUD_ROOT_PATH_FORMAT = "/servers/%s/%s";
     private static final String ROOT_PATH_PREFIX = "/servers";
     private static final String DEFAULT_SERVICE_NAME = "cluster-ip";
-    public static final String DEFAULT_DOMAIN_NAME = "mc.zk.thinkjoy.cn";
+    /** 云管理中心域名 */
+    public static final String DEFAULT_DOMAIN_NAME = "mc.zk.kong.cn";
+
+    /** 当前的业务系统列表 */
     private List<String> bizSystems = Lists.newArrayList();
+    /** 已经进行了目录监听的业务系统集合 */
     private Set<String> regedBizSystems = Sets.newHashSet();
+    /** 被删除的业务系统 */
     private Set<String> removedBizSystems = Sets.newHashSet();
+    /** 是否对服务发现的根目录进行了监听 */
     private volatile boolean isAlreadyReg = false;
 
     public ZKClusterManagerClient() {
@@ -58,12 +66,12 @@ public class ZKClusterManagerClient implements IClusterManagerClient {
         CuratorFramework client = ZKClient.getClient();
         String path = null;
         if(productCode == null) {
-            path = String.format("/servers/%s", new Object[]{CloudContextFactory.getCloudContext().getApplicationName()});
+            path = String.format(ROOT_PATH_FORMAT, CloudContextFactory.getCloudContext().getApplicationName());
         } else {
-            path = String.format("/servers/%s/%s", new Object[]{productCode, CloudContextFactory.getCloudContext().getApplicationName()});
+            path = String.format(CLOUD_ROOT_PATH_FORMAT, productCode, CloudContextFactory.getCloudContext().getApplicationName());
         }
 
-        HashMap serverMetadata = Maps.newHashMap();
+        HashMap<String,String> serverMetadata = Maps.newHashMap();
         serverMetadata.put("number", CloudContextFactory.getCloudContext().getApplicationName());
         serverMetadata.put("name", CloudContextFactory.getCloudContext().getApplicationZhName());
         serverMetadata.put("owner", CloudContextFactory.getCloudContext().getOwner());
@@ -76,6 +84,7 @@ public class ZKClusterManagerClient implements IClusterManagerClient {
         serverMetadata.put("productCode", CloudContextFactory.getCloudContext().getProductCode());
         ZKAliveServer server = this.innerRegister(client, path);
 
+        //增加业务系统节点描述
         try {
             Thread.sleep(10L);
             ZKClient.getClient().setData().forPath(path, JSON.toJSONBytes(serverMetadata, new SerializerFeature[]{SerializerFeature.PrettyFormat}));
@@ -91,11 +100,15 @@ public class ZKClusterManagerClient implements IClusterManagerClient {
         return this.register(CloudContextFactory.getCloudContext().getProductCode(), CloudContextFactory.getCloudContext().getApplicationName());
     }
 
+    /**
+     * 把当前服务注册到zk
+     * @param client
+     */
     private ZKAliveServer innerRegister(CuratorFramework client, String path) {
         ZKAliveServer server = null;
 
         try {
-            server = new ZKAliveServer(client, path, "cluster-ip", "cluster server ip");
+            server = new ZKAliveServer(client, path, DEFAULT_SERVICE_NAME, "cluster server ip");
             server.start();
         } catch (Exception var5) {
             logger.error("", var5);
@@ -113,9 +126,9 @@ public class ZKClusterManagerClient implements IClusterManagerClient {
         JsonInstanceSerializer serializer = new JsonInstanceSerializer(InstanceDetails.class);
         String path = null;
         if(productCode == null) {
-            path = String.format("/servers/%s", new Object[]{appName});
+            path = String.format(ROOT_PATH_FORMAT, appName);
         } else {
-            path = String.format("/servers/%s/%s", new Object[]{productCode, appName});
+            path = String.format(CLOUD_ROOT_PATH_FORMAT, productCode, appName);
         }
 
         ServiceDiscovery serviceDiscovery = ServiceDiscoveryBuilder.builder(InstanceDetails.class).client(ZKClient.getClient()).basePath(path).serializer(serializer).build();
@@ -129,7 +142,7 @@ public class ZKClusterManagerClient implements IClusterManagerClient {
         ArrayList servers = Lists.newArrayList();
 
         try {
-            Collection e = serviceDiscovery.queryForInstances("cluster-ip");
+            Collection e = serviceDiscovery.queryForInstances(DEFAULT_SERVICE_NAME);
             Iterator i$ = e.iterator();
 
             while(i$.hasNext()) {
@@ -151,7 +164,7 @@ public class ZKClusterManagerClient implements IClusterManagerClient {
 
     public List<String> getBizSystems() {
         try {
-            List e = DynConfigClientFactory.getClient().getNodes("/servers");
+            List e = DynConfigClientFactory.getClient().getNodes(ROOT_PATH_PREFIX);
             this.bizSystems = e;
             return this.bizSystems;
         } catch (Exception var2) {
@@ -166,7 +179,7 @@ public class ZKClusterManagerClient implements IClusterManagerClient {
 
     public String getBizSystemMetadata(String productCode, String appName) {
         try {
-            return productCode == null?DynConfigClientFactory.getClient().getConfig(String.format("/servers/%s", new Object[]{appName})):DynConfigClientFactory.getClient().getConfig(String.format("/servers/%s/%s", new Object[]{productCode, appName}));
+            return productCode == null?DynConfigClientFactory.getClient().getConfig(String.format(ROOT_PATH_FORMAT, appName)):DynConfigClientFactory.getClient().getConfig(String.format(CLOUD_ROOT_PATH_FORMAT, productCode, appName));
         } catch (Exception var4) {
             logger.error("getBizSystemMetadata error for [" + appName + "]", var4);
             return null;
@@ -174,6 +187,7 @@ public class ZKClusterManagerClient implements IClusterManagerClient {
     }
 
     public synchronized void initListenerServerChange(final IChangeListener listener) {
+        //先注册根目录
         if(!this.isAlreadyReg) {
             logger.warn("register /servers listener");
             DynConfigClientFactory.getClient().registerListeners("/servers", new IChangeListener() {
@@ -186,25 +200,27 @@ public class ZKClusterManagerClient implements IClusterManagerClient {
                         public void run() {
                             ZKClusterManagerClient.logger.warn("bizsystem change {}", configuration);
                             ZKClusterManagerClient.this.removedBizSystems.clear();
-                            List newNodes = configuration.getNodes();
+                            List<String> newNodes = configuration.getNodes();
                             Iterator datas = ZKClusterManagerClient.this.bizSystems.iterator();
 
                             while(datas.hasNext()) {
                                 String node = (String)datas.next();
-                                if(!newNodes.contains(node)) {
+                                if(!newNodes.contains(node)) {//新的里面不存在表示被删除
                                     ZKClusterManagerClient.this.removedBizSystems.add(node);
                                 }
                             }
 
-                            ZKClusterManagerClient.this.bizSystems = newNodes;
+                            bizSystems = newNodes;
                             if(configuration.getPathChildrenCacheEvent() != null) {
+                                //从path获取appName
                                 String[] datas1 = configuration.getPathChildrenCacheEvent().getData().getPath().split("/");
-                                if(datas1 != null && datas1.length > 2) {
+                                if(datas1.length > 2) {
                                     configuration.setAppName(datas1[2]);
                                 }
                             }
 
-                            HashMap datas2 = Maps.newHashMap();
+                            //需要触发上层告诉有新应用上线
+                            HashMap<String,String> datas2 = Maps.newHashMap();
                             if(configuration.getPathChildrenCacheEvent() != null && Type.CHILD_REMOVED == configuration.getPathChildrenCacheEvent().getType()) {
                                 datas2.put("firstadd", "remove");
                             } else {
@@ -216,7 +232,8 @@ public class ZKClusterManagerClient implements IClusterManagerClient {
                                 listener.receiveConfigInfo(configuration);
                             }
 
-                            ZKClusterManagerClient.this.initListenerServerChange(listener);
+                            //重新注册
+                            initListenerServerChange(listener);
                         }
                     });
                 }
@@ -224,58 +241,70 @@ public class ZKClusterManagerClient implements IClusterManagerClient {
             this.isAlreadyReg = true;
         }
 
+        //删除的节点监听器清空，防止内存泄露
         String path = null;
-        Iterator tempBizSystems = this.removedBizSystems.iterator();
+        for(String node : removedBizSystems){
+            path = String.format(ROOT_PATH_FORMAT, node) + "/" + DEFAULT_SERVICE_NAME;
 
-        while(tempBizSystems.hasNext()) {
-            String i$ = (String)tempBizSystems.next();
-            path = String.format("/servers/%s", new Object[]{i$}) + "/" + "cluster-ip";
             DynConfigClientFactory.getClient().removeListeners(path);
-            this.regedBizSystems.remove(path);
-            logger.warn("remove server {}", i$);
+            regedBizSystems.remove(path);
+
+            logger.warn("remove server {}", node);
         }
 
-        List tempBizSystems1 = this.getBizSystems();
+        //进行节点数据的监听
+        List<String> tempBizSystems = getBizSystems();
+        for(String appName : tempBizSystems){
+            path = String.format(ROOT_PATH_FORMAT, appName) + "/" + DEFAULT_SERVICE_NAME;
 
-        for(Iterator i$1 = tempBizSystems1.iterator(); i$1.hasNext(); this.regedBizSystems.add(path)) {
-            String appName = (String)i$1.next();
-            path = String.format("/servers/%s", new Object[]{appName}) + "/" + "cluster-ip";
-            if(!this.regedBizSystems.contains(path)) {
+
+            if(!regedBizSystems.contains(path)) {  //之前未监听的才监听
                 logger.warn("register {} listener", path);
                 DynConfigClientFactory.getClient().registerListeners(path, new IChangeListener() {
+                    @Override
                     public Executor getExecutor() {
                         return Executors.newSingleThreadExecutor();
                     }
 
+                    @Override
                     public void receiveConfigInfo(final Configuration configuration) {
-                        this.getExecutor().execute(new Runnable() {
+                        getExecutor().execute(new Runnable() {
+                            @Override
                             public void run() {
-                                HashMap datas = Maps.newHashMap();
-                                if(configuration.getPathChildrenCacheEvent() != null && configuration.getPathChildrenCacheEvent().getData() != null && configuration.getPathChildrenCacheEvent().getData().getPath() != null) {
+                                Map<String, String> datas = Maps.newHashMap();
+                                if(configuration.getPathChildrenCacheEvent() != null
+                                        && configuration.getPathChildrenCacheEvent().getData() != null
+                                        && configuration.getPathChildrenCacheEvent().getData().getPath() != null){
                                     String[] splits = configuration.getPathChildrenCacheEvent().getData().getPath().split("/");
                                     if(splits != null && splits.length > 2) {
                                         configuration.setAppName(splits[2]);
                                     }
-
-                                    String changeAddress = (String)((Map)JSON.parseObject(new String(configuration.getPathChildrenCacheEvent().getData().getData()), Map.class)).get("address");
-                                    if(configuration.getPathChildrenCacheEvent().getType() == Type.CHILD_ADDED) {
+                                    String changeAddress = (String) JSON.parseObject(new String(configuration.getPathChildrenCacheEvent().getData().getData()), Map.class).get("address");
+                                    if(configuration.getPathChildrenCacheEvent().getType() == PathChildrenCacheEvent.Type.CHILD_ADDED) {
                                         datas.put("add", changeAddress);
                                         configuration.setDatas(datas);
+
+                                        //real handle
                                         listener.receiveConfigInfo(configuration);
-                                    } else if(configuration.getPathChildrenCacheEvent().getType() == Type.CHILD_REMOVED) {
+                                    } else if(configuration.getPathChildrenCacheEvent().getType() == PathChildrenCacheEvent.Type.CHILD_REMOVED) {
                                         datas.put("remove", changeAddress);
                                         configuration.setDatas(datas);
-                                        if(!ClusterManagerClientFactory.createClient().getLiveServers(configuration.getAppName()).contains(changeAddress)) {
+
+                                        //如果 还有相同的节点数据 ，不触发上层处理
+                                        if(!ClusterManagerClientFactory.createClient().getLiveServers(configuration.getAppName()).contains(changeAddress)){
+                                            //real handle
                                             listener.receiveConfigInfo(configuration);
                                         } else {
-                                            ZKClusterManagerClient.logger.warn("还有相同的节点数据 ，不触发上层处理");
+                                            logger.warn("还有相同的节点数据 ，不触发上层处理");
                                         }
-                                    } else if(configuration.getPathChildrenCacheEvent().getType() == Type.CHILD_UPDATED) {
+                                    } else if(configuration.getPathChildrenCacheEvent().getType() == PathChildrenCacheEvent.Type.CHILD_UPDATED) {
                                         datas.put("update", new String(configuration.getPathChildrenCacheEvent().getData().getData()));
                                         configuration.setDatas(datas);
+
+                                        //real handle
                                         listener.receiveConfigInfo(configuration);
                                     } else {
-                                        ZKClusterManagerClient.logger.error("unsupport path child change {}", configuration);
+                                        logger.error("unsupport path child change {}", configuration);
                                     }
                                 }
 
@@ -284,7 +313,7 @@ public class ZKClusterManagerClient implements IClusterManagerClient {
                     }
                 });
             }
+            regedBizSystems.add(path);
         }
-
     }
 }
