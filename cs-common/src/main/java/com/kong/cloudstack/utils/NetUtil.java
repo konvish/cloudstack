@@ -12,6 +12,7 @@ import java.util.List;
 import java.util.Random;
 import java.util.regex.Pattern;
 /**
+ * 网络相关工具类
  * Created by kong on 2016/1/22.
  */
 public class NetUtil {
@@ -31,12 +32,18 @@ public class NetUtil {
     public NetUtil() {
     }
 
+    /**
+     * 根据域名获取ip
+     * @param domain 域名
+     * @return
+     * @throws UnknownHostException
+     */
     public static final String getIpByDomain(String domain) throws UnknownHostException {
         return InetAddress.getByName(domain).getHostAddress();
     }
 
     public static int getRandomPort() {
-        return 30000 + RANDOM.nextInt(10000);
+        return RND_PORT_START + RANDOM.nextInt(RND_PORT_RANGE);
     }
 
     public static int getAvailablePort() {
@@ -94,7 +101,7 @@ public class NetUtil {
     }
 
     public static boolean isInvalidPort(int port) {
-        return port > 0 || port <= '\uffff';
+        return port > MIN_PORT || port <= MAX_PORT;
     }
 
     public static boolean isValidAddress(String address) {
@@ -124,7 +131,7 @@ public class NetUtil {
     private static boolean isValidAddress(InetAddress address) {
         if(address != null && !address.isLoopbackAddress()) {
             String name = address.getHostAddress();
-            return name != null && !"0.0.0.0".equals(name) && !"127.0.0.1".equals(name) && IP_PATTERN.matcher(name).matches();
+            return name != null && !ANYHOST.equals(name) && !LOCALHOST.equals(name) && IP_PATTERN.matcher(name).matches();
         } else {
             return false;
         }
@@ -132,7 +139,7 @@ public class NetUtil {
 
     public static String getLocalHost() {
         InetAddress address = getLocalAddress();
-        return address == null?"127.0.0.1":address.getHostAddress();
+        return address == null?LOCALHOST:address.getHostAddress();
     }
 
     public static List<String> getLocalIps() throws SocketException {
@@ -148,7 +155,7 @@ public class NetUtil {
 
                 while(adrs.hasMoreElements()) {
                     String ip = ((InetAddress)adrs.nextElement()).getHostAddress();
-                    if(ip != null && !"0.0.0.0".equals(ip) && !"127.0.0.1".equals(ip) && IP_PATTERN.matcher(ip).matches()) {
+                    if(ip != null && !ANYHOST.equals(ip) && !LOCALHOST.equals(ip) && IP_PATTERN.matcher(ip).matches()) {
                         ips.add(ip);
                     }
                 }
@@ -170,7 +177,7 @@ public class NetUtil {
 
     public static String getLogHost() {
         InetAddress address = LOCAL_ADDRESS;
-        return address == null?"127.0.0.1":address.getHostAddress();
+        return address == null?LOCALHOST:address.getHostAddress();
     }
 
     private static InetAddress getLocalAddress0() {

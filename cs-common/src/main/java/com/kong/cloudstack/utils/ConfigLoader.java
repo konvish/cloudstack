@@ -10,6 +10,8 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.util.Properties;
 /**
+ * 配置文件装载器
+ * 注意本地配置文件一般只存储初始化时需要的信息，不应该放置太多的配置信息（运行期可变的配置信息更不能放置在此），所以此类只支持一个配置文件
  * Created by kong on 2016/1/22.
  */
 public class ConfigLoader {
@@ -34,11 +36,11 @@ public class ConfigLoader {
         properties = new Properties();
 
         try {
-            String e = System.getProperty("configFile");
-            if(Strings.isNullOrEmpty(e)) {
-                InputStream is = Thread.currentThread().getContextClassLoader().getResourceAsStream("/config/main-conf.properties");
+            String e = System.getProperty(DEFAULT_CONFIG_FILE_KEY);
+            if(Strings.isNullOrEmpty(e)) {//没有配置 从classloader获取
+                InputStream is = Thread.currentThread().getContextClassLoader().getResourceAsStream(APP_MAINCONF_FILE);
                 if(is == null) {
-                    is = Thread.currentThread().getContextClassLoader().getResourceAsStream("config/main-conf.properties");
+                    is = Thread.currentThread().getContextClassLoader().getResourceAsStream(APP_MAINCONF_FILE_DOUBLECHECK);
                 }
 
                 properties.load(is);

@@ -3,6 +3,7 @@ package com.kong.cloudstack.utils;
 import java.util.concurrent.ThreadFactory;
 import java.util.concurrent.atomic.AtomicInteger;
 /**
+ * 具有名称的线程工厂 摘自dubbo
  * Created by kong on 2016/1/22.
  */
 public class NamedThreadFactory implements ThreadFactory {
