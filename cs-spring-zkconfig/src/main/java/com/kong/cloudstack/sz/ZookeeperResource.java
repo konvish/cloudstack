@@ -20,6 +20,7 @@ import org.springframework.context.ApplicationContextAware;
 import org.springframework.context.support.AbstractApplicationContext;
 import org.springframework.core.io.AbstractResource;
 /**
+ *
  * Created by kong on 2016/1/24.
  */
 public class ZookeeperResource extends AbstractResource implements ApplicationContextAware, DisposableBean {
@@ -27,8 +28,8 @@ public class ZookeeperResource extends AbstractResource implements ApplicationCo
     public static final String URL_HEADER = "zk://";
     private static final String PATH_FORMAT = "/startconfigs/%s/config";
     private static final String CLOUD_PATH_FORMAT = "/startconfigs/%s/%s/config";
-    private String path = String.format("/startconfigs/%s/config", new Object[]{CloudContextFactory.getCloudContext().getApplicationName()});
-    private String cloud_path = String.format("/startconfigs/%s/%s/config", new Object[]{CloudContextFactory.getCloudContext().getProductCode(), CloudContextFactory.getCloudContext().getApplicationName()});
+    private String path = String.format("/startconfigs/%s/config", CloudContextFactory.getCloudContext().getApplicationName());
+    private String cloud_path = String.format("/startconfigs/%s/%s/config",CloudContextFactory.getCloudContext().getProductCode(), CloudContextFactory.getCloudContext().getApplicationName());
     ConcurrentMap<String, Object> recoverDataCache = Maps.newConcurrentMap();
     AbstractApplicationContext ctx;
 

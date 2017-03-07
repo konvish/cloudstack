@@ -5,11 +5,11 @@ import ch.qos.logback.classic.encoder.PatternLayoutEncoder;
 import ch.qos.logback.core.rolling.RollingFileAppender;
 import ch.qos.logback.core.rolling.SizeAndTimeBasedFNATP;
 import ch.qos.logback.core.rolling.TimeBasedRollingPolicy;
-import com.kong.cloudstack.utils.FileLoader;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import com.google.common.collect.Queues;
 import com.google.common.io.Files;
+import com.kong.cloudstack.utils.FileLoader;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -17,9 +17,9 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
-import java.lang.reflect.Array;
 import java.util.*;
-import java.util.concurrent.*;
+import java.util.concurrent.BlockingQueue;
+import java.util.concurrent.ConcurrentMap;
 
 /**
  * MonitorEvent容器，保存所有的MonitorEvent
@@ -27,6 +27,8 @@ import java.util.concurrent.*;
  * 会对所有的MonitorEvent进行类别分类
  *  会将所有事件分散在几个不同的文件中；
  *  会把整机的事件元数据存储在一个特定的meta文件中
+ *  存储地址,元数据："/var/lib/logs/monitors/meta/meta.properties"
+ *  日志："/var/lib/logs/monitors/事件类型/*.log"
  *  Created by kong on 2016/1/22.
  */
 public class MonitorEventContainer {
@@ -91,9 +93,9 @@ public class MonitorEventContainer {
 
     /**
      * 动态生成对应的logger  以时间和文件大小滚动
-     * @param className
-     * @param filePrefix
-     * @return
+     * @param className 类名
+     * @param filePrefix 生成文件前缀
+     * @return logger
      * @throws ClassNotFoundException
      */
     private static ch.qos.logback.classic.Logger initLogger(String className, String filePrefix) throws ClassNotFoundException {
@@ -133,8 +135,8 @@ public class MonitorEventContainer {
 
     /**
      * 获取特定事件的元数据描述信息
-     * @param eventName
-     * @return
+     * @param eventName 事件名称
+     * @return FormatMonitorEvent.MetaData
      */
     public FormatMonitorEvent.MetaData getMetadataByName(String eventName){
         return metaMap.get(eventName);
@@ -142,12 +144,12 @@ public class MonitorEventContainer {
 
     /**
      * 新建特定格式的event
-     * @param name
-     * @param eventType
-     * @param metas
-     * @param externalUserId
-     * @param properties
-     * @return
+     * @param name 事件名称
+     * @param eventType 事件类型
+     * @param metas 新加元数据信息
+     * @param externalUserId 业务操作的主体方
+     * @param properties 附加信息
+     * @return 事件
      */
     public Event createFormatEvent(String name, String eventType, String metas, String externalUserId, Map<String, String> properties){
         FormatMonitorEvent.MetaData oldMetadata = metaMap.get(name);
@@ -155,6 +157,7 @@ public class MonitorEventContainer {
             String[] metaArray = metas.split(SPLIT_STR);
             oldMetadata = new FormatMonitorEvent.MetaData(Arrays.asList(metaArray), name);
 
+            //有原始信息就get(),没有就put()
             FormatMonitorEvent.MetaData newMetadata = metaMap.putIfAbsent(name, oldMetadata);
             if(newMetadata == null){
                 newMetadata = oldMetadata;
@@ -188,12 +191,6 @@ public class MonitorEventContainer {
                 } catch (IOException e) {
                     logger.error("metaStore error", e);
                     fileMetaQueue.offer(metaData);
-                } finally{
-//                    try {
-//                        metaFileOut.close();
-//                    } catch (IOException e) {
-//                        logger.error("metaFileOut close error", e);
-//                    }
                 }
             }
         } catch (InterruptedException e) {
@@ -201,6 +198,9 @@ public class MonitorEventContainer {
         }
     }
 
+    /**
+     * 初始化
+     */
     public void init(){
         loadMetaFiles();
     }

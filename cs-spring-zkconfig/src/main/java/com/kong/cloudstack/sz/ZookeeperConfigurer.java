@@ -18,7 +18,7 @@ import java.util.Map;
  * Created by kong on 2016/1/24.
  */
 public class ZookeeperConfigurer extends PropertySourcesPlaceholderConfigurer {
-    private Map<String, Object> ctxPropsMap = new HashMap();
+    private Map<String, Object> ctxPropsMap = new HashMap<String,Object>();
     private ZookeeperResource zkLocation;
     private Resource[] localLocations = new Resource[0];
 

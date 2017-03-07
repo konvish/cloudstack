@@ -3,7 +3,7 @@ package com.kong.monitor;
 import org.apache.sirona.counters.Counter;
 import org.apache.sirona.counters.Counter.Key;
 import org.apache.sirona.counters.MetricData;
-import org.apache.sirona.store.counter.BatchCounterDataStore;
+import org.apache.sirona.store.memory.counter.BatchCounterDataStore;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 

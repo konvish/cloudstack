@@ -22,6 +22,7 @@ public class ClassNamedCacheResolver extends AbstractCacheResolver {
         Set cacheNames = context.getOperation().getCacheNames();
         if(cacheNames.size() > 0 && CacheConstants.ALLUNUSED.equals(cacheNames.iterator().next()) && context.getTarget() != null && context.getTarget().toString().contains("@")) {
             cacheNames.clear();
+            //拿缓存的名字
             String className = context.getTarget().toString().split("\\@")[0];
             String[] pkgName = className.split("\\.");
             StringBuilder simpleName = new StringBuilder(20);
@@ -31,6 +32,7 @@ public class ClassNamedCacheResolver extends AbstractCacheResolver {
                 simpleName.append(pkgName[i].charAt(0)).append(".");
             }
 
+            //简写类名，如com.kong.cache.spring.ClassNamedCacheResolver，变成c.k.c.s.ClassNamedCacheResolver
             simpleName.append(pkgName[pkgName.length - 1]);
             cacheNames.add(simpleName.toString());
         }

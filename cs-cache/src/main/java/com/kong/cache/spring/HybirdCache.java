@@ -7,7 +7,7 @@ import org.springframework.cache.support.SimpleValueWrapper;
 import java.io.Serializable;
 /**
  * 两级缓存
- * L2基于redis实现，因为涉及到key的序列化，目前默认试用String类型
+ * L2基于redis实现，因为涉及到key的序列化，目前默认使用String类型
  * Created by kong on 2016/1/22.
  */
 public class HybirdCache implements Cache {
