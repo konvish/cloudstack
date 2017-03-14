@@ -42,10 +42,18 @@ public class NetUtil {
         return InetAddress.getByName(domain).getHostAddress();
     }
 
+    /**
+     * 随机生成端口，范围30000~40000
+     * @return 端口
+     */
     public static int getRandomPort() {
         return RND_PORT_START + RANDOM.nextInt(RND_PORT_RANGE);
     }
 
+    /**
+     * 获取可用端口
+     * @return 端口
+     */
     public static int getAvailablePort() {
         ServerSocket ss = null;
 
@@ -71,6 +79,10 @@ public class NetUtil {
         return e1;
     }
 
+    /**
+     * 获取可用端口
+     * @return 端口
+     */
     public static int getAvailablePort(int port) {
         if(port <= 0) {
             return getAvailablePort();
@@ -100,34 +112,75 @@ public class NetUtil {
         }
     }
 
+    /**
+     * 是否符合端口范围
+     * @param port 端口号
+     * @return boolean
+     */
     public static boolean isInvalidPort(int port) {
         return port > MIN_PORT || port <= MAX_PORT;
     }
 
+    /**
+     * 是否有效地址
+     * @param address 地址
+     * @return boolean
+     */
     public static boolean isValidAddress(String address) {
         return ADDRESS_PATTERN.matcher(address).matches();
     }
 
+    /**
+     * 是否本机地址
+     * @param host host
+     * @return boolean
+     */
     public static boolean isLocalHost(String host) {
         return host != null && (LOCAL_IP_PATTERN.matcher(host).matches() || host.equalsIgnoreCase("localhost"));
     }
 
+    /**
+     * 是否0.0.0.0
+     * @param host host
+     * @return boolean
+     */
     public static boolean isAnyHost(String host) {
         return "0.0.0.0".equals(host);
     }
 
+    /**
+     * 是否无效的本地地址
+     * @param host host
+     * @return boolean
+     */
     public static boolean isInvalidLocalHost(String host) {
         return host == null || host.length() == 0 || host.equalsIgnoreCase("localhost") || host.equals("0.0.0.0") || LOCAL_IP_PATTERN.matcher(host).matches();
     }
 
+    /**
+     *  是否有效的本地地址
+     * @param host host
+     * @return boolean
+     */
     public static boolean isValidLocalHost(String host) {
         return !isInvalidLocalHost(host);
     }
 
+    /**
+     * 获取本地的socket地址
+     * @param host host
+     * @param port 端口
+     * @return InetSocketAddress
+     */
     public static InetSocketAddress getLocalSocketAddress(String host, int port) {
         return isInvalidLocalHost(host)?new InetSocketAddress(port):new InetSocketAddress(host, port);
     }
 
+    /**
+     * 是否有效地址
+     * @param address InetAddress
+     * @return boolean
+     */
     private static boolean isValidAddress(InetAddress address) {
         if(address != null && !address.isLoopbackAddress()) {
             String name = address.getHostAddress();
@@ -137,11 +190,20 @@ public class NetUtil {
         }
     }
 
+    /**
+     * 获取本地的host地址
+     * @return s'$host
+     */
     public static String getLocalHost() {
         InetAddress address = getLocalAddress();
         return address == null?LOCALHOST:address.getHostAddress();
     }
 
+    /**
+     * 获取本地的ip列表
+     * @return list(ip)
+     * @throws SocketException
+     */
     public static List<String> getLocalIps() throws SocketException {
         ArrayList ips = Lists.newArrayList();
         ArrayList listAdr = Lists.newArrayList();
@@ -165,6 +227,10 @@ public class NetUtil {
         }
     }
 
+    /**
+     *  获取本地地址
+     * @return InetAddress
+     */
     public static InetAddress getLocalAddress() {
         if(LOCAL_ADDRESS != null) {
             return LOCAL_ADDRESS;
@@ -175,11 +241,19 @@ public class NetUtil {
         }
     }
 
+    /**
+     * 获取本地的host
+     * @return s'$host
+     */
     public static String getLogHost() {
         InetAddress address = LOCAL_ADDRESS;
         return address == null?LOCALHOST:address.getHostAddress();
     }
 
+    /**
+     * 获取本地地址
+     * @return InetAddress
+     */
     private static InetAddress getLocalAddress0() {
         InetAddress localAddress = null;
 
@@ -224,6 +298,11 @@ public class NetUtil {
         return localAddress;
     }
 
+    /**
+     * 根据host名称获取ip
+     * @param hostName hostName
+     * @return s'$ip
+     */
     public static String getIpByHost(String hostName) {
         try {
             return InetAddress.getByName(hostName).getHostAddress();
@@ -232,10 +311,20 @@ public class NetUtil {
         }
     }
 
+    /**
+     * InetSocketAddress转成字符地址
+     * @param address InetSocketAddress
+     * @return s'$address
+     */
     public static String toAddressString(InetSocketAddress address) {
         return address.getAddress().getHostAddress() + ":" + address.getPort();
     }
 
+    /**
+     * 字符地址转成InetSocketAddress
+     * @param address 地址
+     * @return InetSocketAddress
+     */
     public static InetSocketAddress toAddress(String address) {
         int i = address.indexOf(58);
         String host;
@@ -251,6 +340,14 @@ public class NetUtil {
         return new InetSocketAddress(host, port);
     }
 
+    /**
+     * 把协议，host，端口，路径拼接成url
+     * @param protocol 协议
+     * @param host host
+     * @param port 端口
+     * @param path 路径
+     * @return s'$url
+     */
     public static String toURL(String protocol, String host, int port, String path) {
         StringBuilder sb = new StringBuilder();
         sb.append(protocol).append("://");

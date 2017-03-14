@@ -1,6 +1,5 @@
 package com.kong.cloudstack.cmc;
 
-import com.kong.cloudstack.cmc.IClusterManagerClient;
 import com.kong.cloudstack.cmc.impl.ZKClusterManagerClient;
 
 /**

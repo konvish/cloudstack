@@ -79,6 +79,11 @@ public class RedisManagerRepository<K, V> implements IRedisRepository<K, V> {
         this.hashValueSerializer = hashValueSerializer;
     }
 
+    /**
+     * 对key进行序列化
+     * @param key key
+     * @return byte[] key
+     */
     private byte[] rawKey(Object key) {
         Assert.notNull(key, "non null key required");
         if (keySerializer == null && key instanceof byte[]) {
@@ -87,6 +92,13 @@ public class RedisManagerRepository<K, V> implements IRedisRepository<K, V> {
         return keySerializer.serialize(key);
     }
 
+    /**
+     * 对List进行反序列化
+     * StringRedisSerializer
+     * @param rawValues rawValues
+     * @param <T> 反序列化后泛型T
+     * @return
+     */
     @SuppressWarnings("unchecked")
     <T> List<T> deserializeHashValues(List<byte[]> rawValues) {
         if (hashValueSerializer == null) {
@@ -95,6 +107,12 @@ public class RedisManagerRepository<K, V> implements IRedisRepository<K, V> {
         return SerializationUtils.deserialize(rawValues, hashValueSerializer);
     }
 
+    /**
+     * 基于Jdk对List反序列化方式
+     * JdkSerializationRedisSerializer
+     * @param rawValues rawValues
+     * @return list(V)
+     */
     @SuppressWarnings("unchecked")
     List<V> deserializeValues(List<byte[]> rawValues) {
         if (valueSerializer == null) {
@@ -103,6 +121,11 @@ public class RedisManagerRepository<K, V> implements IRedisRepository<K, V> {
         return SerializationUtils.deserialize(rawValues, valueSerializer);
     }
 
+    /**
+     * 集合key的序列化
+     * @param keys keys集合
+     * @return byte[][]
+     */
     private byte[][] rawKeys(Collection<K> keys) {
         final byte[][] rawKeys = new byte[keys.size()][];
 
@@ -114,6 +137,12 @@ public class RedisManagerRepository<K, V> implements IRedisRepository<K, V> {
         return rawKeys;
     }
 
+    /**
+     * value序列化
+     * JdkSerializationRedisSerializer
+     * @param value value
+     * @return byte[]
+     */
     @SuppressWarnings("unchecked")
     byte[] rawValue(Object value) {
         if (valueSerializer == null && value instanceof byte[]) {
@@ -122,6 +151,12 @@ public class RedisManagerRepository<K, V> implements IRedisRepository<K, V> {
         return valueSerializer.serialize(value);
     }
 
+    /**
+     * hashKeys 序列化
+     * @param hashKeys hashKeys...
+     * @param <HK> 泛型
+     * @return byte[][]
+     */
     <HK> byte[][] rawHashKeys(HK... hashKeys) {
         final byte[][] rawHashKeys = new byte[hashKeys.length][];
         int i = 0;
@@ -131,6 +166,12 @@ public class RedisManagerRepository<K, V> implements IRedisRepository<K, V> {
         return rawHashKeys;
     }
 
+    /**
+     * hashKey 序列化
+     * @param hashKey hashKey
+     * @param <HK> 泛型
+     * @return byte[]
+     */
     @SuppressWarnings("unchecked")
     <HK> byte[] rawHashKey(HK hashKey) {
         Assert.notNull(hashKey, "non null hash key required");
@@ -140,6 +181,11 @@ public class RedisManagerRepository<K, V> implements IRedisRepository<K, V> {
         return hashKeySerializer.serialize(hashKey);
     }
 
+    /**
+     * 反序列化
+     * @param value value
+     * @return V
+     */
     private V deserializeValue(byte[] value) {
         if (valueSerializer == null) {
             return (V) value;
@@ -147,6 +193,13 @@ public class RedisManagerRepository<K, V> implements IRedisRepository<K, V> {
         return (V) valueSerializer.deserialize(value);
     }
 
+    /**
+     * 对Map进行反序列化
+     * @param entries map
+     * @param <HK> 泛型HashKey
+     * @param <HV> 泛型HashValue
+     * @return Map<HK.HV>
+     */
     @SuppressWarnings("unchecked")
     <HK, HV> Map<HK, HV> deserializeHashMap(Map<byte[], byte[]> entries) {
         // connection in pipeline/multi mode
@@ -163,6 +216,12 @@ public class RedisManagerRepository<K, V> implements IRedisRepository<K, V> {
         return map;
     }
 
+    /**
+     * 反序列化hashKey
+     * @param value value
+     * @param <HK> hashKey泛型
+     * @return HK
+     */
     @SuppressWarnings({"unchecked"})
     <HK> HK deserializeHashKey(byte[] value) {
         if (hashKeySerializer == null) {
@@ -171,6 +230,12 @@ public class RedisManagerRepository<K, V> implements IRedisRepository<K, V> {
         return (HK) hashKeySerializer.deserialize(value);
     }
 
+    /**
+     * 反序列化HashValue
+     * @param value value
+     * @param <HV> HV
+     * @return HV
+     */
     @SuppressWarnings("unchecked")
     <HV> HV deserializeHashValue(byte[] value) {
         if (hashValueSerializer == null) {
@@ -179,6 +244,11 @@ public class RedisManagerRepository<K, V> implements IRedisRepository<K, V> {
         return (HV) hashValueSerializer.deserialize(value);
     }
 
+    /**
+     * 对Set进行反序列化
+     * @param rawValues set
+     * @return Set<V>
+     */
     @SuppressWarnings("unchecked")
     Set<V> deserializeValues(Set<byte[]> rawValues) {
         if (valueSerializer == null) {
@@ -187,6 +257,11 @@ public class RedisManagerRepository<K, V> implements IRedisRepository<K, V> {
         return SerializationUtils.deserialize(rawValues, valueSerializer);
     }
 
+    /**
+     * 序列化多个值
+     * @param values values...
+     * @return byte[][]
+     */
     byte[][] rawValues(Object... values) {
         final byte[][] rawValues = new byte[values.length][];
         int i = 0;
@@ -196,6 +271,12 @@ public class RedisManagerRepository<K, V> implements IRedisRepository<K, V> {
         return rawValues;
     }
 
+    /**
+     * 序列化hashValue
+     * @param value value
+     * @param <HV> HV
+     * @return byte[]
+     */
     @SuppressWarnings("unchecked")
     <HV> byte[] rawHashValue(HV value) {
         if (hashValueSerializer == null & value instanceof byte[]) {
@@ -204,6 +285,12 @@ public class RedisManagerRepository<K, V> implements IRedisRepository<K, V> {
         return hashValueSerializer.serialize(value);
     }
 
+    /**
+     * 反序列化hashKey集合
+     * @param rawKeys set
+     * @param <T> 泛型T
+     * @return Set<T>
+     */
     @SuppressWarnings("unchecked")
     <T> Set<T> deserializeHashKeys(Set<byte[]> rawKeys) {
         if (hashKeySerializer == null) {
@@ -238,7 +325,10 @@ public class RedisManagerRepository<K, V> implements IRedisRepository<K, V> {
     /********************************************/
     /********************************************/
 
-    // Key
+    /**
+     * 删除key
+     * @param key key
+     */
     public void del(final K key) {
         final byte[] rawKey = rawKey(key);
         Jedis jedis = jedisSentinelPool.getResource();
