@@ -10,11 +10,16 @@ import java.util.concurrent.ConcurrentMap;
  * Created by kong on 2016/1/22.
  */
 public class ZKClientManager {
-    private static ConcurrentMap<String, CuratorFramework> zkClientMap = new ConcurrentHashMap();
+    private static ConcurrentMap<String, CuratorFramework> zkClientMap = new ConcurrentHashMap<String, CuratorFramework>();
 
     private ZKClientManager() {
     }
 
+    /**
+     * 获取zk客户端
+     * @param ip ip
+     * @return
+     */
     public static CuratorFramework getClient(String ip) {
         if(ip != null && ip.trim().length() != 0) {
             synchronized(ip) {

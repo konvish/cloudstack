@@ -20,58 +20,89 @@ import org.springframework.context.ApplicationContextAware;
 import org.springframework.context.support.AbstractApplicationContext;
 import org.springframework.core.io.AbstractResource;
 /**
+ * zookeeper资源
  *
  * Created by kong on 2016/1/24.
  */
 public class ZookeeperResource extends AbstractResource implements ApplicationContextAware, DisposableBean {
     private static Logger log = LoggerFactory.getLogger(ZookeeperResource.class);
+    /**
+     * zk地址头
+     */
     public static final String URL_HEADER = "zk://";
     private static final String PATH_FORMAT = "/startconfigs/%s/config";
     private static final String CLOUD_PATH_FORMAT = "/startconfigs/%s/%s/config";
-    private String path = String.format("/startconfigs/%s/config", CloudContextFactory.getCloudContext().getApplicationName());
-    private String cloud_path = String.format("/startconfigs/%s/%s/config",CloudContextFactory.getCloudContext().getProductCode(), CloudContextFactory.getCloudContext().getApplicationName());
+    private String path = String.format(PATH_FORMAT, CloudContextFactory.getCloudContext().getApplicationName());
+    private String cloud_path = String.format(CLOUD_PATH_FORMAT,CloudContextFactory.getCloudContext().getProductCode(), CloudContextFactory.getCloudContext().getApplicationName());
     ConcurrentMap<String, Object> recoverDataCache = Maps.newConcurrentMap();
     AbstractApplicationContext ctx;
 
     public ZookeeperResource() {
     }
 
+    /**
+     * 检查zk的配置是否存在
+     * @return boolean
+     */
     public boolean exists() {
         try {
             return null != ZKClient.getClient().checkExists().forPath("");
         } catch (Exception var2) {
-            log.error("Falied to detect the config in zoo keeper.", var2);
+            log.error("Falied to detect the config in zookeeper.", var2);
             return false;
         }
     }
 
+    /**
+     * 一直返回false
+     * @return boolean
+     */
     public boolean isOpen() {
         return false;
     }
 
+    /**
+     * 获取zk的URL
+     * @return url
+     * @throws IOException
+     */
     public URL getURL() throws IOException {
         return new URL(URL_HEADER + this.path);
     }
 
+    /**
+     * 获取配置文件名
+     * @return str
+     * @throws IllegalStateException
+     */
     public String getFilename() throws IllegalStateException {
         return this.path;
     }
 
+    /**
+     * zk的配置文件描述
+     * @return str
+     */
     public String getDescription() {
         return "Zookeeper resouce at '"+URL_HEADER + this.path;
     }
 
+    /**
+     * 读取配置文件的内容为数据流
+     * @return 输入流
+     * @throws IOException
+     */
     public InputStream getInputStream() throws IOException {
         byte[] data = null;
 
         try {
             if(ZKClient.getClient().checkExists().forPath(this.cloud_path) == null) {
-                data = (byte[])ZKClient.getClient().getData().forPath(this.path);
+                data = ZKClient.getClient().getData().forPath(this.path);
             } else if(ZKClient.getClient().checkExists().forPath(this.cloud_path) == null) {
                 log.error("{} and {} none exists", this.cloud_path, this.path);
                 System.exit(-1);
             } else {
-                data = (byte[])ZKClient.getClient().getData().forPath(this.cloud_path);
+                data = ZKClient.getClient().getData().forPath(this.cloud_path);
             }
         } catch (Exception var7) {
             log.error("zk server error", var7);
@@ -107,10 +138,19 @@ public class ZookeeperResource extends AbstractResource implements ApplicationCo
         }
     }
 
+    /**
+     * 设置上下文
+     * @param ctx ApplicationContext
+     * @throws BeansException
+     */
     public void setApplicationContext(ApplicationContext ctx) throws BeansException {
         this.ctx = (AbstractApplicationContext)ctx;
     }
 
+    /**
+     * 销毁ZookeeperResource
+     * @throws Exception
+     */
     public void destroy() throws Exception {
         log.info("Destory Zookeeper Resouce.");
     }

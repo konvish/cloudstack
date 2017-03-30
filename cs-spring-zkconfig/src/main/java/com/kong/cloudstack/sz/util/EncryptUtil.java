@@ -19,7 +19,7 @@ public class EncryptUtil {
     }
 
     public static String encrypt(String cryptStr) throws Exception {
-        return "S\u0001" + AESUtil.aesEncrypt(cryptStr, "i love change");
+        return encryptStr + AESUtil.aesEncrypt(cryptStr, "i love change");
     }
 
     public static String decrypt(String encryptStr) throws Exception {

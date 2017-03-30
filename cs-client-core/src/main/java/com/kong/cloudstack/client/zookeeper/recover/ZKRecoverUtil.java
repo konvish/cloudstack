@@ -10,6 +10,7 @@ import java.io.IOException;
 import java.util.concurrent.ConcurrentMap;
 import java.util.concurrent.Executors;
 /**
+ *  zk异常恢复工具
  * Created by kong on 2016/1/22.
  */
 public class ZKRecoverUtil {
@@ -20,9 +21,9 @@ public class ZKRecoverUtil {
 
     /**
      * 异步进行配置数据本地容灾处理
-     * @param content
-     * @param path
-     * @param recoverDataCache
+     * @param content content
+     * @param path path
+     * @param recoverDataCache 数据
      */
     public static void doRecover(final byte[] content, final String path, final ConcurrentMap<String, Object> recoverDataCache) {
         Executors.newSingleThreadExecutor(new NamedThreadFactory("DYN-CONFIG-RECOVER")).execute(new Runnable() {
@@ -59,7 +60,7 @@ public class ZKRecoverUtil {
 
     /**
      * 从本地装载备份数据
-     * @param path
+     * @param path path
      * @return
      * @throws IOException
      */

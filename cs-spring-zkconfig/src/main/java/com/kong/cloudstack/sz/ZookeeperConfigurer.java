@@ -14,39 +14,74 @@ import java.net.URL;
 import java.util.HashMap;
 import java.util.Map;
 /**
- *
+ * zookeeper配置
+ * 继承自{@link PropertySourcesPlaceholderConfigurer}
+ * 可从spring的配置文件中获取配置，JVM配置(System.getProperty())和系统变量配置(System.getenv())
  * Created by kong on 2016/1/24.
  */
 public class ZookeeperConfigurer extends PropertySourcesPlaceholderConfigurer {
+    /**
+     * 配置Map
+     */
     private Map<String, Object> ctxPropsMap = new HashMap<String,Object>();
+    //zk的配置地址
     private ZookeeperResource zkLocation;
     private Resource[] localLocations = new Resource[0];
 
     public ZookeeperConfigurer() {
     }
 
+    /**
+     * 添加新的配置地址
+     * @param location resource
+     */
     public void setLocation(Resource location) {
         this.zkLocation = (ZookeeperResource)location;
         super.setLocations((Resource[])mergeArray(this.localLocations, this.zkLocation));
     }
 
+    /**
+     * 添加多个配置地址
+     * @param locations resources
+     */
     public void setLocations(Resource[] locations) {
         System.arraycopy(locations, 0, this.localLocations, 0, locations.length);
         super.setLocations((Resource[])mergeArray(locations, this.zkLocation));
     }
 
+    /**
+     * 处理配置文件
+     * @param beanFactoryToProcess 配置bean工厂
+     * @param propertyResolver 配置处理类
+     * @throws BeansException
+     */
     protected void processProperties(ConfigurableListableBeanFactory beanFactoryToProcess, ConfigurablePropertyResolver propertyResolver) throws BeansException {
         super.processProperties(beanFactoryToProcess, propertyResolver);
     }
 
+    /**
+     * key对应的配置内容
+     * @param key key
+     * @return obj
+     */
     public Object getProperty(String key) {
         return this.ctxPropsMap.get(key);
     }
 
-    public ZookeeperResource getZkResoucre() {
+    /**
+     * zk资源信息
+     * @return zookeeperResource
+     */
+    public ZookeeperResource getZkResource() {
         return this.zkLocation;
     }
 
+    /**
+     * 合并两份资源
+     * @param m1 资源1
+     * @param m2 资源2
+     * @return 数组(m2追加在m1后面)
+     */
     private static Resource[] mergeArray(Resource[] m1, Resource m2) {
         Resource[] all = new Resource[m1.length + 1];
         if(m1.length > 0) {

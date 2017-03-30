@@ -12,6 +12,7 @@ import org.slf4j.LoggerFactory;
 import java.net.UnknownHostException;
 /**
  * zk客户端
+ * 存在生命周期
  * Created by kong on 2016/1/22.
  */
 public class ZKClient extends AbstractLifecycle {
@@ -42,7 +43,7 @@ public class ZKClient extends AbstractLifecycle {
 
     /**
      * 根据ip获取zk client, 可以直接调用该方法，但不建议 请使用 ZKClientManager 调用
-     * @param ip
+     * @param ip ip
      * @return
      */
     public static CuratorFramework create(String ip) {
