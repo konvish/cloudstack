@@ -9,7 +9,7 @@ import org.apache.sirona.store.gauge.Value;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 /**
- *
+ * gauge日志管理
  * Created by kong on 2016/1/24.
  */
 public class LoggerGaugeDataStore extends AggregatedGaugeDataStoreAdapter {
@@ -21,14 +21,17 @@ public class LoggerGaugeDataStore extends AggregatedGaugeDataStoreAdapter {
     public LoggerGaugeDataStore() {
     }
 
+    /**
+     * 添加gauge事件
+     * @param gauges gauges
+     */
     protected void pushAggregatedGauges(Map<Role, Value> gauges) {
         try {
             long e = System.currentTimeMillis();
-            Iterator i$ = gauges.entrySet().iterator();
 
-            while(i$.hasNext()) {
-                Entry gauge = (Entry)i$.next();
-                SPEC_LOGGER.error("gauge-" + ((Role)gauge.getKey()).getName() + '-' + ((Value)gauge.getValue()).getMean() + '-' + e);
+            for (Object o : gauges.entrySet()) {
+                Entry gauge = (Entry) o;
+                SPEC_LOGGER.error(GAUGE_PREFIX + ((Role) gauge.getKey()).getName() + SEP + ((Value) gauge.getValue()).getMean() + SEP + e);
             }
         } catch (Exception var6) {
             logger.error("error exception", var6);

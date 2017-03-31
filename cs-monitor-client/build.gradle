@@ -5,5 +5,6 @@ dependencies {
     compile 'com.google.guava:guava:19.0'
     compile 'org.apache.commons:commons-proxy:1.0'
     compile 'org.apache.sirona:sirona-core:0.3-incubating'
+    compile 'org.codehaus.janino:janino:3.0.7'
     compile project(":cs-common")
 }

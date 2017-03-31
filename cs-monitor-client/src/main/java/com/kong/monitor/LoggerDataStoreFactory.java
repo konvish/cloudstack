@@ -7,7 +7,7 @@ import org.apache.sirona.store.gauge.CommonGaugeDataStore;
 import org.apache.sirona.store.memory.tracking.InMemoryPathTrackingDataStore;
 import org.apache.sirona.store.status.EmptyStatuses;
 /**
- *
+ * 日志管理工厂
  * Created by kong on 2016/1/24.
  */
 public class LoggerDataStoreFactory extends DelegateDataStoreFactory {

@@ -1,7 +1,10 @@
 package com.kong.monitor.biz;
 
 /**
- * TODO 一句话描述该类用途
+ * 格式化日志
+ * 时间，事件名称，事件Id，app名称，用户，自定义键值对
+ * 1490925206578 name="Failed Login" event_id="sshd:failure" app="jane" user="jane"
+ * somefieldname="foobar" somefieldname2="foobar2" somefieldname3="foobar3" somefieldname4="foobar4"
  * Created by kong on 2016/1/24.
  */
 public class FormatTest {

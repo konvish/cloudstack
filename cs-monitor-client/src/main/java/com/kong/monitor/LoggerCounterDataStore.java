@@ -8,9 +8,8 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.util.Collection;
-import java.util.Iterator;
 /**
- *
+ * Counter日志管理
  * Created by kong on 2016/1/24.
  */
 public class LoggerCounterDataStore extends BatchCounterDataStore {
@@ -22,21 +21,21 @@ public class LoggerCounterDataStore extends BatchCounterDataStore {
     public LoggerCounterDataStore() {
     }
 
+    /**
+     * 批量添加Counter事件
+     * @param instances C<Counter>
+     */
     protected synchronized void pushCountersByBatch(Collection<Counter> instances) {
         try {
             long e = System.currentTimeMillis();
-            Iterator i$ = instances.iterator();
 
-            while(i$.hasNext()) {
-                Counter counter = (Counter)i$.next();
+            for (Counter counter : instances) {
                 Key key = counter.getKey();
-                String prefix = "counter-" + key.getRole().getName() + '-' + key.getName() + '-';
-                MetricData[] arr$ = MetricData.values();
-                int len$ = arr$.length;
+                String prefix = COUNTER_PREFIX + key.getRole().getName() + SEP + key.getName() + SEP;
+                MetricData[] metricData = MetricData.values();
 
-                for(int i$1 = 0; i$1 < len$; ++i$1) {
-                    MetricData data = arr$[i$1];
-                    SPEC_LOGGER.error(prefix + data.name() + '-' + data.value(counter) + '-' + e);
+                for (MetricData data : metricData) {
+                    SPEC_LOGGER.error(prefix + data.name() + SEP + data.value(counter) + SEP + e);
                 }
             }
         } catch (Exception var12) {

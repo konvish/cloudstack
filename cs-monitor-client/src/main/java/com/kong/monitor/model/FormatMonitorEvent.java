@@ -10,6 +10,7 @@ import java.util.Map;
 
 /**
  * 监控事件，所有的监控使用此事件模型处理
+ * 实现事件接口
  * Created by kong on 2016/1/22.
  */
 public class FormatMonitorEvent implements Event {

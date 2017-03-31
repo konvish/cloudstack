@@ -49,6 +49,9 @@ public class BizStatLogger {
     public static volatile int dumpInterval = 300;
     public static final SimpleDateFormat df = new SimpleDateFormat("yyy-MM-dd HH:mm:ss:SSS");
 
+    /**
+     * 日志书写者，设置每一行的目标格式
+     */
     private static LogWriter logWriter = new LogWriter() {
         private void addLine(StringBuilder sb, Object key, Object group, Object flag, StatCounter sc, String time) {
             sb.append(key).append(logFieldSep).append(group).append(logFieldSep).append(flag).append(logFieldSep).append(typeCount).append(logFieldSep).append(sc.getCount()).append(logFieldSep)
@@ -73,20 +76,37 @@ public class BizStatLogger {
         }
     };
 
+    /**
+     * 自定义logWriter格式
+     * @param logWriter logWriter
+     */
     public static void setLogWriter(LogWriter logWriter) {
         BizStatLogger.logWriter = logWriter;
     }
 
+    /**
+     * 日志书写者接口
+     */
     public static interface LogWriter {
         void writeLog(Map<Object, ConcurrentHashMap<Object, ConcurrentHashMap<Object, StatCounter>>> map);
     }
 
+    /**
+     * 日志统计类
+     * 多线程下保证操作的原子性
+     */
     static class StatCounter {
         private final AtomicLong count = new AtomicLong(0L);
         private final AtomicLong value = new AtomicLong(0L);
         private final AtomicLong min = new AtomicLong(Long.MAX_VALUE);
         private final AtomicLong max = new AtomicLong(Long.MIN_VALUE);
 
+        /**
+         * 加上count，value
+         * 并记下value的最小值与最大值
+         * @param c count
+         * @param v value
+         */
         public void add(long c, long v) {
             this.count.addAndGet(c);
             this.value.addAndGet(v);
@@ -112,6 +132,9 @@ public class BizStatLogger {
             }
         }
 
+        /**
+         * 复原
+         */
         public synchronized void reset() {
             this.count.set(0L);
             this.value.set(0L);
@@ -140,12 +163,24 @@ public class BizStatLogger {
         }
     }
 
+    /**
+     * 设置表的大小，key为1024，表的大小0.75f，操作线程数32
+     */
     private static ConcurrentHashMap<Object, ConcurrentHashMap<Object, ConcurrentHashMap<Object, StatCounter>>> keys = new ConcurrentHashMap<Object, ConcurrentHashMap<Object, ConcurrentHashMap<Object, StatCounter>>>(
             maxkeysize, 0.75f, 32);
 
+    /**
+     * 添加BizStat日志
+     * @param key app名称
+     * @param group 组别
+     * @param flag 方法
+     * @param count 计算器
+     * @param timeuse 时间
+     */
     public static void add(Object key, Object group, Object flag, long count, long timeuse) {
         ConcurrentHashMap<Object, ConcurrentHashMap<Object, ConcurrentHashMap<Object, StatCounter>>> oldkeys = keys;
         ConcurrentHashMap<Object, ConcurrentHashMap<Object, StatCounter>> groups = oldkeys.get(key);
+        /**不存在组就添加进去*/
         if (groups == null) {
             ConcurrentHashMap<Object, ConcurrentHashMap<Object, StatCounter>> newGroups = new ConcurrentHashMap<Object, ConcurrentHashMap<Object, StatCounter>>();
             groups = oldkeys.putIfAbsent(key, newGroups);
@@ -154,6 +189,7 @@ public class BizStatLogger {
                 insureSize();
             }
         }
+        /**组中的方法，不存在添加进去*/
         ConcurrentHashMap<Object, StatCounter> flags = groups.get(group);
         if (flags == null) {
             ConcurrentHashMap<Object, StatCounter> newFlags = new ConcurrentHashMap<Object, StatCounter>();
@@ -162,6 +198,7 @@ public class BizStatLogger {
                 flags = newFlags;
             }
         }
+        /**方法的StatCounter，不存在添加进去*/
         StatCounter counter = flags.get(flag);
         if (counter == null) {
             StatCounter newCounter = new StatCounter();
@@ -194,6 +231,9 @@ public class BizStatLogger {
         fullDumpThread.start();
     }
 
+    /**
+     * 保证key的数量不超过1024
+     */
     private static void insureSize() {
         if (keys.size() < maxkeysize) {
             return;
@@ -201,9 +241,16 @@ public class BizStatLogger {
         submitFlush(false);
     }
 
+    /**
+     * 提交日志
+     * @param isFlushAll 是否key满1024
+     * @return boolean
+     */
     private static boolean submitFlush(final boolean isFlushAll) {
+        /**不是正在提交状态，加锁*/
         if (!isInFlushing && lock.tryLock()) {
             try {
+                //更新为提交状态
                 isInFlushing = true;
                 flushExecutor.execute(new Runnable() {
                     public void run() {
@@ -246,6 +293,9 @@ public class BizStatLogger {
         }
     };
 
+    /**
+     *
+     */
     private static void flushLRU() {
         List<Object[]> counts = new ArrayList<Object[]>();
         for (Map.Entry<Object, ConcurrentHashMap<Object, ConcurrentHashMap<Object, StatCounter>>> e0 : keys.entrySet()) {

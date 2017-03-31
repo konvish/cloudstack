@@ -55,6 +55,10 @@ public class MonitorEventContainer {
     private Properties metaProperties;
     private Properties deltaMetaProperties = new Properties();
 
+    /**
+     * 添加事件
+     * @param event 事件
+     */
     public void addEvent(Event event) {
         monitorEventList.add(event);
     }

@@ -11,6 +11,7 @@ import java.util.concurrent.Executors;
 /**
  * MonitorEventContainer 管理器  会对container进行相应的清理工作
  * <p/>
+ * 继承生命周期AbstractLifecycle
  * Created by kong on 2016/1/22.
  */
 public class MonitorEventManager extends AbstractLifecycle{
