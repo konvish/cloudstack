@@ -22,6 +22,7 @@ import java.util.concurrent.TimeUnit;
 
 /**
  * 基于spring集成Jedis template，在applicationContext-redis中配置
+ * 利用jedis自主操作api
  * Redis集群操作API，实现了RedisAPIs接口
  * Created by kong on 2016/1/24.
  */
@@ -341,6 +342,10 @@ public class RedisManagerRepository<K, V> implements IRedisRepository<K, V> {
         }
     }
 
+    /**
+     * 删除多个key
+     * @param keys keys
+     */
     public void del(final Collection<K> keys) {
 
         Jedis jedis = jedisSentinelPool.getResource();
@@ -359,6 +364,11 @@ public class RedisManagerRepository<K, V> implements IRedisRepository<K, V> {
         }
     }
 
+    /**
+     * 检查key是否存在
+     * @param key key
+     * @return boolean
+     */
     public Boolean exists(final K key) {
         final byte[] rawKey = rawKey(key);
         Jedis jedis = jedisSentinelPool.getResource();
@@ -373,6 +383,13 @@ public class RedisManagerRepository<K, V> implements IRedisRepository<K, V> {
 
     }
 
+    /**
+     * 设置key的过期时间
+     * @param key key
+     * @param timeout 过期时间s
+     * @param unit timeUnit
+     * @return boolean
+     */
     public Boolean expire(final K key, final long timeout, final TimeUnit unit) {
 
         final byte[] rawKey = rawKey(key);
@@ -393,6 +410,11 @@ public class RedisManagerRepository<K, V> implements IRedisRepository<K, V> {
         }
     }
 
+    /**
+     *  jedis 的时间
+     * @param jedis jedis
+     * @return long
+     */
     public Long time(Jedis jedis) {
 
         List<String> serverTimeInformation = jedis.time();
@@ -404,6 +426,11 @@ public class RedisManagerRepository<K, V> implements IRedisRepository<K, V> {
         return Converters.toTimeMillis(serverTimeInformation.get(0), serverTimeInformation.get(1));
     }
 
+    /**
+     * 设置key在date时候过期
+     * @param key key
+     * @param date date
+     */
     public void expireAt(final K key, Date date) {
         final byte[] rawKey = rawKey(key);
         Jedis jedis = jedisSentinelPool.getResource();
@@ -417,6 +444,11 @@ public class RedisManagerRepository<K, V> implements IRedisRepository<K, V> {
         }
     }
 
+    /**
+     * 获取所有包含pattern的key
+     * @param pattern pattern
+     * @return set<key>
+     */
     public Set<K> keys(final K pattern) {
         final byte[] rawKey = rawKey(pattern);
         Jedis jedis = jedisSentinelPool.getResource();
@@ -432,6 +464,11 @@ public class RedisManagerRepository<K, V> implements IRedisRepository<K, V> {
         }
     }
 
+    /**
+     * 获取key对应的类型
+     * @param key key
+     * @return str
+     */
     public String type(final K key) {
         final byte[] rawKey = rawKey(key);
         Jedis jedis = jedisSentinelPool.getResource();
@@ -445,6 +482,11 @@ public class RedisManagerRepository<K, V> implements IRedisRepository<K, V> {
         }
     }
 
+    /**
+     * 获取key对应的值
+     * @param key key
+     * @return V
+     */
     public V get(final K key) {
         final byte[] rawKey = rawKey(key);
         Jedis jedis = jedisSentinelPool.getResource();
@@ -458,6 +500,13 @@ public class RedisManagerRepository<K, V> implements IRedisRepository<K, V> {
         }
     }
 
+    /**
+     * 获取key对应的值，原来的值与value组成的set
+     * string的大小不超过1GB
+     * @param key key
+     * @param value value
+     * @return V
+     */
     public V getSet(final K key, final V value) {
         final byte[] rawKey = rawKey(key);
         final byte[] rawValue = rawValue(value);
@@ -472,6 +521,12 @@ public class RedisManagerRepository<K, V> implements IRedisRepository<K, V> {
         }
     }
 
+    /**
+     * key的值加上delta个位置
+     * @param key key
+     * @param delta delta
+     * @return long
+     */
     public Long incr(final K key, final long delta) {
         final byte[] rawKey = rawKey(key);
         Jedis jedis = jedisSentinelPool.getResource();
@@ -485,6 +540,11 @@ public class RedisManagerRepository<K, V> implements IRedisRepository<K, V> {
         }
     }
 
+    /**
+     * 设置key与对应值
+     * @param key key
+     * @param value value
+     */
     public void set(final K key, final V value) {
         final byte[] rawKey = rawKey(key);
         final byte[] rawValue = rawValue(value);
@@ -498,6 +558,13 @@ public class RedisManagerRepository<K, V> implements IRedisRepository<K, V> {
         }
     }
 
+    /**
+     * 设置key对应value，并设置过期时间
+     * @param key key
+     * @param value value
+     * @param timeout 过期时间s
+     * @param unit TimeUnit
+     */
     public void set(final K key, final V value, final long timeout, final TimeUnit unit) {
         final byte[] rawKey = rawKey(key);
         final byte[] rawValue = rawValue(value);
@@ -505,14 +572,18 @@ public class RedisManagerRepository<K, V> implements IRedisRepository<K, V> {
         try {
             jedis.setex(rawKey, (int) TimeoutUtils.toSeconds(timeout, unit), rawValue);
         } catch (Exception e) {
-            jedis.psetex(rawKey, (int) timeout, rawValue);
+            jedis.psetex(rawKey, timeout, rawValue);
             this.returnBrokenResource(jedis, e);
         } finally {
             this.returnResource(jedis);
         }
     }
 
-    // Hash
+    /**
+     * 删除hashKey
+     * @param key key
+     * @param hKeys hashKeys
+     */
     public void hDel(final K key, final Object... hKeys) {
         final byte[] rawKey = rawKey(key);
         final byte[][] rawHashKeys = rawHashKeys(hKeys);
@@ -526,6 +597,12 @@ public class RedisManagerRepository<K, V> implements IRedisRepository<K, V> {
         }
     }
 
+    /**
+     * 检查hashKey是否存在
+     * @param key key
+     * @param hKeys hashKey
+     * @return boolean
+     */
     public Boolean hExists(final K key, final K hKeys) {
         final byte[] rawKey = rawKey(key);
         final byte[] rawHashKey = rawHashKey(hKeys);
@@ -540,6 +617,11 @@ public class RedisManagerRepository<K, V> implements IRedisRepository<K, V> {
         }
     }
 
+    /**
+     * 获取key对应的map
+     * @param key key
+     * @return Map
+     */
     public Map<K, V> hGet(final K key) {
         Jedis jedis = jedisSentinelPool.getResource();
         final byte[] rawKey = rawKey(key);
@@ -554,6 +636,12 @@ public class RedisManagerRepository<K, V> implements IRedisRepository<K, V> {
         }
     }
 
+    /**
+     * 根据key与hashKey获取值
+     * @param key key
+     * @param hKey hashKey
+     * @return V
+     */
     public V hGet(final K key, final K hKey) {
         Jedis jedis = jedisSentinelPool.getResource();
         final byte[] rawKey = rawKey(key);
@@ -569,6 +657,11 @@ public class RedisManagerRepository<K, V> implements IRedisRepository<K, V> {
         }
     }
 
+    /**
+     * key里面的所有的hashKey
+     * @param key key
+     * @return set<hashKey>
+     */
     public Set<K> hKeys(final K key) {
         Jedis jedis = jedisSentinelPool.getResource();
         final byte[] rawKey = rawKey(key);
@@ -583,6 +676,11 @@ public class RedisManagerRepository<K, V> implements IRedisRepository<K, V> {
         }
     }
 
+    /**
+     * key对应map的长度
+     * @param key key
+     * @return long
+     */
     public Long hLen(final K key) {
         Jedis jedis = jedisSentinelPool.getResource();
         final byte[] rawKey = rawKey(key);
@@ -596,6 +694,12 @@ public class RedisManagerRepository<K, V> implements IRedisRepository<K, V> {
         }
     }
 
+    /**
+     * 以平铺的方式设置key对应的map
+     * @param key key
+     * @param hk hashKey
+     * @param hv hashValue
+     */
     public void hSet(final K key, final K hk, final V hv) {
         Jedis jedis = jedisSentinelPool.getResource();
         final byte[] rawKey = rawKey(key);
@@ -610,6 +714,11 @@ public class RedisManagerRepository<K, V> implements IRedisRepository<K, V> {
         }
     }
 
+    /**
+     * 以map方式设置key对应的map
+     * @param key key
+     * @param map map
+     */
     public void hSet(final K key, final Map<K, V> map) {
         if (map.isEmpty()) {
             return;
@@ -630,6 +739,11 @@ public class RedisManagerRepository<K, V> implements IRedisRepository<K, V> {
         }
     }
 
+    /**
+     * 获取key里面所有的hashValue
+     * @param key key
+     * @return list<hashValue>
+     */
     public List<V> hVals(final K key) {
         Jedis jedis = jedisSentinelPool.getResource();
         final byte[] rawKey = rawKey(key);
@@ -644,8 +758,15 @@ public class RedisManagerRepository<K, V> implements IRedisRepository<K, V> {
         }
     }
 
-    // List
+    /*** List ***********/
 
+    /**
+     * 获取key对应下标为index的值
+     * 针对List
+     * @param key key
+     * @param index index
+     * @return V
+     */
     public V lIndex(final K key, final long index) {
         Jedis jedis = jedisSentinelPool.getResource();
         final byte[] rawKey = rawKey(key);
@@ -660,6 +781,12 @@ public class RedisManagerRepository<K, V> implements IRedisRepository<K, V> {
         }
     }
 
+    /**
+     * key对应List的index位置插入值
+     * @param key key
+     * @param index index
+     * @param value value
+     */
     public void lInsert(final K key, final long index, V value) {
         Jedis jedis = jedisSentinelPool.getResource();
         final byte[] rawKey = rawKey(key);
@@ -673,6 +800,11 @@ public class RedisManagerRepository<K, V> implements IRedisRepository<K, V> {
         }
     }
 
+    /**
+     * 获取key对应list的长度
+     * @param key key
+     * @return long
+     */
     public Long lLen(final K key) {
         Jedis jedis = jedisSentinelPool.getResource();
         final byte[] rawKey = rawKey(key);
@@ -686,6 +818,11 @@ public class RedisManagerRepository<K, V> implements IRedisRepository<K, V> {
         }
     }
 
+    /**
+     * 从key对应的list中pop出值
+     * @param key key
+     * @return V
+     */
     public V lPop(final K key) {
         Jedis jedis = jedisSentinelPool.getResource();
         final byte[] rawKey = rawKey(key);
@@ -700,6 +837,13 @@ public class RedisManagerRepository<K, V> implements IRedisRepository<K, V> {
         }
     }
 
+    /**
+     * 某个时间从key对应的list中pop出值
+     * @param key key
+     * @param timeout 时间s
+     * @param unit TimeUnit
+     * @return V
+     */
     public V lPop(final K key, long timeout, TimeUnit unit) {
         Jedis jedis = jedisSentinelPool.getResource();
         final byte[] rawKey = rawKey(key);
@@ -716,6 +860,13 @@ public class RedisManagerRepository<K, V> implements IRedisRepository<K, V> {
         }
     }
 
+    /**
+     * list中push value
+     * lpush是从list的头部开始
+     * @param key key
+     * @param value value
+     * @return list长度
+     */
     public Long lPush(final K key, final V value) {
         Jedis jedis = jedisSentinelPool.getResource();
         final byte[] rawKey = rawKey(key);
@@ -730,6 +881,13 @@ public class RedisManagerRepository<K, V> implements IRedisRepository<K, V> {
         }
     }
 
+    /**
+     * 取出list中下标从start到end的值
+     * @param key key
+     * @param start startIndex
+     * @param end endIndex
+     * @return list<V>
+     */
     public List<V> lRange(final K key, final long start, final long end) {
         Jedis jedis = jedisSentinelPool.getResource();
         final byte[] rawKey = rawKey(key);
@@ -744,6 +902,14 @@ public class RedisManagerRepository<K, V> implements IRedisRepository<K, V> {
         }
     }
 
+    /**
+     * 移除index后面的所有value的值
+     * index可为负数，负数则从后面往前算
+     * @param key key
+     * @param index index
+     * @param value value
+     * @return 移除的数
+     */
     public Long lRem(final K key, final long index, final V value) {
         Jedis jedis = jedisSentinelPool.getResource();
         final byte[] rawKey = rawKey(key);
@@ -758,6 +924,13 @@ public class RedisManagerRepository<K, V> implements IRedisRepository<K, V> {
         }
     }
 
+    /**
+     * 在index后面添加value
+     * index可为负数，负数是从后面往前数
+     * @param key key
+     * @param index index
+     * @param value value
+     */
     public void lSet(final K key, final long index, final V value) {
         Jedis jedis = jedisSentinelPool.getResource();
         final byte[] rawKey = rawKey(key);
@@ -771,6 +944,12 @@ public class RedisManagerRepository<K, V> implements IRedisRepository<K, V> {
         }
     }
 
+    /**
+     * 留下list里面下标start到end的内容
+     * @param key key
+     * @param start startIndex
+     * @param end endIndex
+     */
     public void ltrim(final K key, final long start, final long end) {
         Jedis jedis = jedisSentinelPool.getResource();
         final byte[] rawKey = rawKey(key);
@@ -783,6 +962,13 @@ public class RedisManagerRepository<K, V> implements IRedisRepository<K, V> {
         }
     }
 
+    /**
+     * list中push value
+     * rpush是从list的尾部追加
+     * @param key key
+     * @param value value
+     * @return list长度
+     */
     public Long rPush(final K key, final V value) {
         Jedis jedis = jedisSentinelPool.getResource();
         final byte[] rawKey = rawKey(key);
@@ -797,6 +983,11 @@ public class RedisManagerRepository<K, V> implements IRedisRepository<K, V> {
         }
     }
 
+    /**
+     * 从list尾部pop出值
+     * @param key key
+     * @return V
+     */
     public V rPop(final K key) {
         Jedis jedis = jedisSentinelPool.getResource();
         final byte[] rawKey = rawKey(key);
@@ -813,6 +1004,12 @@ public class RedisManagerRepository<K, V> implements IRedisRepository<K, V> {
 
     // Set
 
+    /**
+     * set中加value
+     * @param key key
+     * @param value value
+     * @return 状态
+     */
     public Long sAdd(final K key, final V value) {
         Jedis jedis = jedisSentinelPool.getResource();
         final byte[] rawKey = rawKey(key);
@@ -827,6 +1024,11 @@ public class RedisManagerRepository<K, V> implements IRedisRepository<K, V> {
         }
     }
 
+    /**
+     * 对比key中没有的值
+     * @param key key
+     * @return key中没有的值
+     */
     public Set<V> sDiff(final K key) {
         Jedis jedis = jedisSentinelPool.getResource();
         final byte[] rawKey = rawKey(key);
@@ -841,6 +1043,11 @@ public class RedisManagerRepository<K, V> implements IRedisRepository<K, V> {
         }
     }
 
+    /**
+     * 获取set中的所有值
+     * @param key key
+     * @return set<V>
+     */
     public Set<V> sMembers(final K key) {
         Jedis jedis = jedisSentinelPool.getResource();
         final byte[] rawKey = rawKey(key);
@@ -855,6 +1062,12 @@ public class RedisManagerRepository<K, V> implements IRedisRepository<K, V> {
         }
     }
 
+    /**
+     * 检查set中是否存在value
+     * @param key key
+     * @param value value
+     * @return boolean
+     */
     public Boolean sIsMember(final K key, final V value) {
         Jedis jedis = jedisSentinelPool.getResource();
         final byte[] rawKey = rawKey(key);
@@ -869,6 +1082,11 @@ public class RedisManagerRepository<K, V> implements IRedisRepository<K, V> {
         }
     }
 
+    /**
+     * set中pop出元素
+     * @param key key
+     * @return V
+     */
     public V sPop(final K key) {
         Jedis jedis = jedisSentinelPool.getResource();
         final byte[] rawKey = rawKey(key);
@@ -883,6 +1101,12 @@ public class RedisManagerRepository<K, V> implements IRedisRepository<K, V> {
         }
     }
 
+    /**
+     * 移除set中的value
+     * @param key key
+     * @param value value
+     * @return 状态
+     */
     public Long sRem(final K key, final V value) {
         Jedis jedis = jedisSentinelPool.getResource();
         final byte[] rawKey = rawKey(key);
@@ -897,6 +1121,11 @@ public class RedisManagerRepository<K, V> implements IRedisRepository<K, V> {
         }
     }
 
+    /**
+     * 获取set的长度
+     * @param key key
+     * @return 长度
+     */
     public Long sCard(K key) {
         Jedis jedis = jedisSentinelPool.getResource();
         final byte[] rawKey = rawKey(key);
@@ -912,6 +1141,12 @@ public class RedisManagerRepository<K, V> implements IRedisRepository<K, V> {
 
     // SortedSet
 
+    /**
+     * sorted中加入value，评分score
+     * @param key key
+     * @param value value
+     * @param score score
+     */
     public void zAdd(final K key, final V value, final double score) {
 
         Jedis jedis = jedisSentinelPool.getResource();
@@ -926,6 +1161,13 @@ public class RedisManagerRepository<K, V> implements IRedisRepository<K, V> {
         }
     }
 
+    /**
+     * 获取sorted set中小标start到end的值
+     * @param key key
+     * @param start startIndex
+     * @param end endIndex
+     * @return set<v>
+     */
     public Set<V> zRange(final K key, final long start, final long end) {
         Jedis jedis = jedisSentinelPool.getResource();
         final byte[] rawKey = rawKey(key);
@@ -940,6 +1182,12 @@ public class RedisManagerRepository<K, V> implements IRedisRepository<K, V> {
         }
     }
 
+    /**
+     * 移除sorted set中values
+     * @param key key
+     * @param values values
+     * @return 状态
+     */
     public Long zRem(final K key, final Object... values) {
         Jedis jedis = jedisSentinelPool.getResource();
         final byte[] rawKey = rawKey(key);
@@ -954,6 +1202,11 @@ public class RedisManagerRepository<K, V> implements IRedisRepository<K, V> {
         }
     }
 
+    /**
+     * 获取sorted set的长度
+     * @param key key
+     * @return 长度
+     */
     public Long zCard(K key) {
         Jedis jedis = jedisSentinelPool.getResource();
         final byte[] rawKey = rawKey(key);
@@ -967,6 +1220,10 @@ public class RedisManagerRepository<K, V> implements IRedisRepository<K, V> {
         }
     }
 
+    /**
+     * 归还jedis
+     * @param jedis jedis
+     */
     private void returnResource(Jedis jedis) {
         try {
             jedisSentinelPool.returnResource(jedis);
@@ -976,6 +1233,11 @@ public class RedisManagerRepository<K, V> implements IRedisRepository<K, V> {
         }
     }
 
+    /**
+     * 归还jedis
+     * @param jedis jedis
+     * @param e
+     */
     private void returnBrokenResource(Jedis jedis, Exception e) {
         jedisSentinelPool.returnBrokenResource(jedis);
         logger.error("Jedis operate error, " + e.getMessage(), e);

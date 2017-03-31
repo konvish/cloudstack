@@ -11,91 +11,91 @@ import java.util.concurrent.TimeUnit;
  * Created by kong on 2016/1/24.
  */
 public interface IRedisRepository<K, V> {
-    void del(K var1);
+    void del(K key);
 
-    void del(Collection<K> var1);
+    void del(Collection<K> keys);
 
-    Boolean exists(K var1);
+    Boolean exists(K key);
 
-    Boolean expire(K var1, long var2, TimeUnit var4);
+    Boolean expire(K key, long seconds, TimeUnit timeUnit);
 
-    void expireAt(K var1, Date var2);
+    void expireAt(K key, Date date);
 
-    Set<K> keys(K var1);
+    Set<K> keys(K key);
 
-    String type(K var1);
+    String type(K key);
 
-    V get(K var1);
+    V get(K key);
 
-    V getSet(K var1, V var2);
+    V getSet(K key, V value);
 
-    Long incr(K var1, long var2);
+    Long incr(K key, long number);
 
-    void set(K var1, V var2);
+    void set(K key, V value);
 
-    void set(K var1, V var2, long var3, TimeUnit var5);
+    void set(K key, V value, long seconds, TimeUnit timeUnit);
 
-    void hDel(K var1, Object... var2);
+    void hDel(K key, Object... hashKey);
 
-    Boolean hExists(K var1, K var2);
+    Boolean hExists(K key, K hashKey);
 
-    Map<K, V> hGet(K var1);
+    Map<K, V> hGet(K key);
 
-    V hGet(K var1, K var2);
+    V hGet(K key, K hashKey);
 
-    Set<K> hKeys(K var1);
+    Set<K> hKeys(K key);
 
-    Long hLen(K var1);
+    Long hLen(K key);
 
-    void hSet(K var1, K var2, V var3);
+    void hSet(K key, K hashKey, V hashValue);
 
-    void hSet(K var1, Map<K, V> var2);
+    void hSet(K key, Map<K, V> map);
 
-    List<V> hVals(K var1);
+    List<V> hVals(K key);
 
-    V lIndex(K var1, long var2);
+    V lIndex(K key, long index);
 
-    void lInsert(K var1, long var2, V var4);
+    void lInsert(K key, long index, V value);
 
-    Long lLen(K var1);
+    Long lLen(K key);
 
-    V lPop(K var1);
+    V lPop(K key);
 
-    V lPop(K var1, long var2, TimeUnit var4);
+    V lPop(K key, long index, TimeUnit timeUnit);
 
-    Long lPush(K var1, V var2);
+    Long lPush(K key, V value);
 
-    List<V> lRange(K var1, long var2, long var4);
+    List<V> lRange(K key, long startIndex, long endIndex);
 
-    Long lRem(K var1, long var2, V var4);
+    Long lRem(K key, long index, V value);
 
-    void lSet(K var1, long var2, V var4);
+    void lSet(K key, long index, V value);
 
-    void ltrim(K var1, long var2, long var4);
+    void ltrim(K key, long startIndex, long endIndex);
 
-    Long rPush(K var1, V var2);
+    Long rPush(K key, V value);
 
-    V rPop(K var1);
+    V rPop(K key);
 
-    Long sAdd(K var1, V var2);
+    Long sAdd(K key, V value);
 
-    Set<V> sDiff(K var1);
+    Set<V> sDiff(K key);
 
-    Set<V> sMembers(K var1);
+    Set<V> sMembers(K key);
 
-    Boolean sIsMember(K var1, V var2);
+    Boolean sIsMember(K key, V value);
 
-    V sPop(K var1);
+    V sPop(K key);
 
-    Long sRem(K var1, V var2);
+    Long sRem(K key, V value);
 
-    Long sCard(K var1);
+    Long sCard(K key);
 
-    void zAdd(K var1, V var2, double var3);
+    void zAdd(K key, V value, double num);
 
-    Set<V> zRange(K var1, long var2, long var4);
+    Set<V> zRange(K key, long startIndex, long endIndex);
 
-    Long zRem(K var1, Object... var2);
+    Long zRem(K key, Object... value);
 
-    Long zCard(K var1);
+    Long zCard(K key);
 }

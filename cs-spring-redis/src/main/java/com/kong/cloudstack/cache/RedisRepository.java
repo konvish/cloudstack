@@ -1,22 +1,13 @@
 package com.kong.cloudstack.cache;
 
-import com.kong.cloudstack.cache.IRedisRepository;
-import java.util.Collection;
-import java.util.Date;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
-import java.util.concurrent.TimeUnit;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.data.redis.core.BoundHashOperations;
-import org.springframework.data.redis.core.BoundListOperations;
-import org.springframework.data.redis.core.BoundSetOperations;
-import org.springframework.data.redis.core.BoundValueOperations;
-import org.springframework.data.redis.core.BoundZSetOperations;
-import org.springframework.data.redis.core.RedisTemplate;
+import org.springframework.data.redis.core.*;
 import org.springframework.stereotype.Repository;
+
+import java.util.*;
+import java.util.concurrent.TimeUnit;
 /**
  * 基于spring集成Jedis template，在applicationContext-redis中配置
  * 在RedisTemplate外又封装了一层，实现了RedisAPIs接口

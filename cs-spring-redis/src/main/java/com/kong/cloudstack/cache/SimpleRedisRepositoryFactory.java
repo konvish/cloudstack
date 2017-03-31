@@ -18,13 +18,21 @@ import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.Properties;
 /**
- *
+ * redis属性工厂
  * Created by kong on 2016/1/24.
  */
 public class SimpleRedisRepositoryFactory {
     public SimpleRedisRepositoryFactory() {
     }
 
+    /**
+     * 新建redis操作接口
+     * @param appName app名称
+     * @param group 组别
+     * @param dataId dataId
+     * @return redisRepository
+     * @throws Exception
+     */
     public static RedisRepository buildNewRedisRepository(String appName, String group, String dataId) throws Exception {
         DynConfigClient dynConfigClient = DynConfigClientFactory.getClient();
         String redisConfigs = dynConfigClient.getConfig(appName, group, dataId);
@@ -33,6 +41,11 @@ public class SimpleRedisRepositoryFactory {
         return buildNewRedisRepository(properties);
     }
 
+    /**
+     * 根据配置属性文件新建redis操作接口
+     * @param properties properties
+     * @return redisRepository
+     */
     public static RedisRepository buildNewRedisRepository(Properties properties) {
         JedisPoolConfig jedisPoolConfig = new JedisPoolConfig();
         jedisPoolConfig.setMaxIdle(Integer.parseInt(properties.getProperty("redis.pool.maxIdle", String.valueOf(jedisPoolConfig.getMaxIdle()))));
@@ -63,6 +76,11 @@ public class SimpleRedisRepositoryFactory {
         return redisRepository;
     }
 
+    /**
+     * 根据配置文件新建redis操作接口
+     * @param properties properties
+     * @return redisManagerRepository
+     */
     public static RedisManagerRepository buildRedisManagerRepository(Properties properties) {
         JedisPoolConfig jedisPoolConfig = new JedisPoolConfig();
         jedisPoolConfig.setMaxIdle(Integer.parseInt(properties.getProperty("redis.pool.maxIdle", String.valueOf(jedisPoolConfig.getMaxIdle()))));
@@ -77,7 +95,7 @@ public class SimpleRedisRepositoryFactory {
         jedisPoolConfig.setTestWhileIdle(Boolean.parseBoolean(properties.getProperty("redis.pool.testWhileIdle", String.valueOf(jedisPoolConfig.getTestWhileIdle()))));
         jedisPoolConfig.setTimeBetweenEvictionRunsMillis((long)Integer.parseInt(properties.getProperty("redis.pool.timeBetweenEvictionRunsMillis", String.valueOf(jedisPoolConfig.getTimeBetweenEvictionRunsMillis()))));
         HashSet sentinels = new HashSet();
-        String ip = properties.getProperty("redis.ip", "10.172.7.57");
+        String ip = properties.getProperty("redis.ip", "127.0.0.1");
         String port = properties.getProperty("redis.port", "26379");
         int database = Integer.parseInt(properties.getProperty("redis.database", "1"));
         String password = properties.getProperty("redis.password", (String)null);
